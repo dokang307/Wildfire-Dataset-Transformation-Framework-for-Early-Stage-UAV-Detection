@@ -1,0 +1,8 @@
+names:
+- Early_Fire
+- Early_Smoke
+nc: 2
+path: /kaggle/input/datasets/dokhang307/dsp-data-optimize/early_fire_smoke_dataset
+test: test/images
+train: train/images
+val: val/images

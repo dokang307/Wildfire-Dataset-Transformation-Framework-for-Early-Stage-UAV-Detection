@@ -1,0 +1,226 @@
+_wandb:
+    value:
+        cli_version: 0.28.0
+        e:
+            kkvctwwet12w0mjdz1y0h500f3ky9rua:
+                args:
+                    - -f
+                    - /tmp/tmp9pl9ku3p.json
+                    - '--HistoryManager.hist_file=:memory:'
+                cpu_count: 2
+                cpu_count_logical: 4
+                cudaVersion: "13.0"
+                disk:
+                    /:
+                        total: "8656922775552"
+                        used: "7473751498752"
+                email: dokhang307@gmail.com
+                executable: /usr/bin/python3
+                gpu: Tesla T4
+                gpu_count: 2
+                gpu_nvidia:
+                    - architecture: Turing
+                      cudaCores: 2560
+                      memoryTotal: "16106127360"
+                      name: Tesla T4
+                      uuid: GPU-6bae0925-e762-907b-06a9-19ef19439805
+                    - architecture: Turing
+                      cudaCores: 2560
+                      memoryTotal: "16106127360"
+                      name: Tesla T4
+                      uuid: GPU-f14d05d0-8368-1157-6dcc-b3af10ab3896
+                host: 09211de827bb
+                memory:
+                    total: "33659379712"
+                os: Linux-6.12.90+-x86_64-with-glibc2.35
+                program: <python with no main file>
+                python: CPython 3.12.13
+                root: /kaggle/working
+                startedAt: "2026-06-26T09:13:56.213448Z"
+                writerId: kkvctwwet12w0mjdz1y0h500f3ky9rua
+        m:
+            - "1": metrics/precision(B)
+              "5": 2
+              "6":
+                - 1
+                - 3
+              "7":
+                - 2
+            - "1": epoch
+              "6":
+                - 3
+              "7": []
+            - "1": class/Early_Smoke_mAP50
+              "5": 2
+              "6":
+                - 1
+                - 3
+              "7":
+                - 2
+            - "1": lr/pg0
+              "5": 2
+              "6":
+                - 1
+                - 3
+              "7": []
+            - "1": lr/pg1
+              "5": 2
+              "6":
+                - 1
+                - 3
+              "7": []
+            - "1": test/precision
+              "6":
+                - 3
+              "7":
+                - 2
+            - "1": test/recall
+              "6":
+                - 3
+              "7":
+                - 2
+            - "1": test/precision_Early_Fire
+              "6":
+                - 3
+              "7":
+                - 2
+            - "1": train/dfl_loss
+              "5": 2
+              "6":
+                - 1
+                - 3
+              "7":
+                - 1
+            - "1": val/dfl_loss
+              "5": 2
+              "6":
+                - 1
+                - 3
+              "7":
+                - 1
+            - "1": metrics/mAP50(B)
+              "5": 2
+              "6":
+                - 1
+                - 3
+              "7":
+                - 2
+            - "1": metrics/mAP50-95(B)
+              "5": 2
+              "6":
+                - 1
+                - 3
+              "7":
+                - 2
+            - "1": class/Early_Fire_mAP50
+              "5": 2
+              "6":
+                - 1
+                - 3
+              "7":
+                - 2
+            - "1": test/mAP50
+              "6":
+                - 3
+              "7":
+                - 2
+            - "1": test/mAP50-95
+              "6":
+                - 3
+              "7":
+                - 2
+            - "1": test/mAP50_Early_Smoke
+              "6":
+                - 3
+              "7":
+                - 2
+            - "1": train/cls_loss
+              "5": 2
+              "6":
+                - 1
+                - 3
+              "7":
+                - 1
+            - "1": val/box_loss
+              "5": 2
+              "6":
+                - 1
+                - 3
+              "7":
+                - 1
+            - "1": metrics/recall(B)
+              "5": 2
+              "6":
+                - 1
+                - 3
+              "7":
+                - 2
+            - "1": test/mAP50_Early_Fire
+              "6":
+                - 3
+              "7":
+                - 2
+            - "1": test/precision_Early_Smoke
+              "6":
+                - 3
+              "7":
+                - 2
+            - "1": test/recall_Early_Smoke
+              "6":
+                - 3
+              "7":
+                - 2
+            - "1": train/box_loss
+              "5": 2
+              "6":
+                - 1
+                - 3
+              "7":
+                - 1
+            - "1": val/cls_loss
+              "5": 2
+              "6":
+                - 1
+                - 3
+              "7":
+                - 1
+            - "1": test/recall_Early_Fire
+              "6":
+                - 3
+              "7":
+                - 2
+        python_version: 3.12.13
+        t:
+            "1":
+                - 1
+                - 41
+            "2":
+                - 1
+                - 30
+                - 41
+                - 49
+                - 80
+            "3":
+                - 2
+                - 7
+                - 13
+                - 15
+                - 16
+                - 61
+                - 62
+                - 63
+            "4": 3.12.13
+            "5": 0.28.0
+            "8":
+                - 2
+                - 13
+            "12": 0.28.0
+            "13": linux-x86_64
+checkpoint:
+    value: /kaggle/input/datasets/dokhang307/dsp-optimize-output-2/runs/detect/runs/detect/phase1_epoch1-100_20260621_183619/weights/last.pt
+dataset:
+    value: /kaggle/input/datasets/dokhang307/dsp-data-optimize/early_fire_smoke_dataset
+resumed_from_epoch:
+    value: 86
+total_epochs:
+    value: 100
