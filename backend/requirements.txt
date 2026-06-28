@@ -1,0 +1,6 @@
+flask==3.1.*
+flask-cors==5.*
+gunicorn==23.*
+onnxruntime==1.22.*
+opencv-python-headless==4.11.*
+numpy==2.*
