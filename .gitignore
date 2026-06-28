@@ -1,1 +1,6 @@
 .venv/
+*.pt
+*.onnx
+__pycache__/
+*.pyc
+*.egg-info/
