@@ -1,0 +1,219 @@
+✓ W&B initialized: https://wandb.ai/minhtrietsonny-fpt-university/early-fire-detection/runs/hpjls8mw
+  Charts sẽ tự động xuất hiện trên dashboard theo từng epoch:
+    train/* → Train Loss panel (box, cls, dfl)
+    val/*   → Val Loss panel   (box, cls, dfl)
+    metrics/* → Val Metrics panel (P, R, mAP50, mAP50-95)
+    class/* → Per-class mAP panel
+    lr/*    → Learning Rate panel
+    test/*  → Test Set panel (logged once at end)
+✓ Callback initialized
+
+================================================================================
+RESUMING FROM CHECKPOINT — TARGET: EPOCH 100
+================================================================================
+  Checkpoint : /kaggle/input/datasets/dokhang307/dsp-optimize-output-2/runs/detect/runs/detect/phase1_epoch1-100_20260621_183619/weights/last.pt
+  Epoch done : 86
+  Remaining  : 14 epochs (→ epoch 100)
+
+Ultralytics 8.4.78 🚀 Python-3.12.13 torch-2.10.0+cu128 CUDA:0 (Tesla T4, 14912MiB)
+[34m[1mengine/trainer: [0magnostic_nms=False, amp=True, angle=1.0, augment=False, auto_augment=randaugment, batch=4, bgr=0.0, box=7.5, cache=False, cfg=None, classes=None, close_mosaic=10, cls=0.5, cls_pw=0.0, compile=False, conf=None, copy_paste=0.1, copy_paste_mode=flip, cos_lr=True, cutmix=0.0, data=/kaggle/working/dataset_corrected.yaml, degrees=5.0, deterministic=True, device=0, dfl=1.5, dis=6.0, distill_model=None, dnn=False, dropout=0.0, dynamic=False, embed=None, end2end=None, epochs=100, erasing=0.4, exist_ok=False, fliplr=0.5, flipud=0.0, format=torchscript, fraction=1.0, freeze=None, half=False, hsv_h=0.015, hsv_s=0.4, hsv_v=0.4, imgsz=1280, int8=False, iou=0.7, keras=False, kobj=1.0, line_width=None, lr0=0.001, lrf=0.01, mask_ratio=4, max_det=300, mixup=0.1, mode=train, model=/kaggle/input/datasets/dokhang307/dsp-optimize-output-2/runs/detect/runs/detect/phase1_epoch1-100_20260621_183619/weights/last.pt, momentum=0.937, mosaic=1.0, multi_scale=0.0, name=phase1_epoch1-100_20260621_183619, nbs=64, nms=False, opset=None, optimize=False, optimizer=AdamW, overlap_mask=True, patience=50, perspective=0.0, plots=True, pose=12.0, pretrained=True, profile=False, project=runs/detect, rect=False, resume=/kaggle/input/datasets/dokhang307/dsp-optimize-output-2/runs/detect/runs/detect/phase1_epoch1-100_20260621_183619/weights/last.pt, retina_masks=False, rle=1.0, save=True, save_conf=False, save_crop=False, save_dir=/kaggle/working/runs/detect/runs/detect/phase1_epoch1-100_20260621_183619, save_frames=False, save_json=False, save_period=10, save_txt=False, scale=0.3, seed=0, shear=0.0, show=False, show_boxes=True, show_conf=True, show_labels=True, simplify=True, single_cls=False, source=None, split=val, stream_buffer=False, task=detect, time=None, tracker=botsort.yaml, translate=0.1, val=True, verbose=True, vid_stride=1, visualize=False, warmup_bias_lr=0.1, warmup_epochs=3.0, warmup_momentum=0.8, weight_decay=0.0005, workers=4, workspace=None
+[KDownloading https://ultralytics.com/assets/Arial.ttf to '/root/.config/Ultralytics/Arial.ttf': 100% ━━━━━━━━━━━━ 755.1KB 90.8MB/s 0.0s
+
+                   from  n    params  module                                       arguments
+  0                  -1  1       928  ultralytics.nn.modules.conv.Conv             [3, 32, 3, 2]
+  1                  -1  1     18560  ultralytics.nn.modules.conv.Conv             [32, 64, 3, 2]
+  2                  -1  1     29056  ultralytics.nn.modules.block.C2f             [64, 64, 1, True]
+  3                  -1  1     73984  ultralytics.nn.modules.conv.Conv             [64, 128, 3, 2]
+  4                  -1  2    197632  ultralytics.nn.modules.block.C2f             [128, 128, 2, True]
+  5                  -1  1    295424  ultralytics.nn.modules.conv.Conv             [128, 256, 3, 2]
+  6                  -1  2    788480  ultralytics.nn.modules.block.C2f             [256, 256, 2, True]
+  7                  -1  1   1180672  ultralytics.nn.modules.conv.Conv             [256, 512, 3, 2]
+  8                  -1  1   1838080  ultralytics.nn.modules.block.C2f             [512, 512, 1, True]
+  9                  -1  1    656896  ultralytics.nn.modules.block.SPPF            [512, 512, 5]
+ 10                  -1  1         0  torch.nn.modules.upsampling.Upsample         [None, 2, 'nearest']
+ 11             [-1, 6]  1         0  ultralytics.nn.modules.conv.Concat           [1]
+ 12                  -1  1    591360  ultralytics.nn.modules.block.C2f             [768, 256, 1]
+ 13                  -1  1         0  torch.nn.modules.upsampling.Upsample         [None, 2, 'nearest']
+ 14             [-1, 4]  1         0  ultralytics.nn.modules.conv.Concat           [1]
+ 15                  -1  1    148224  ultralytics.nn.modules.block.C2f             [384, 128, 1]
+ 16                  -1  1         0  torch.nn.modules.upsampling.Upsample         [None, 2, 'nearest']
+ 17             [-1, 2]  1         0  ultralytics.nn.modules.conv.Concat           [1]
+ 18                  -1  1     37248  ultralytics.nn.modules.block.C2f             [192, 64, 1]
+ 19                  -1  1     36992  ultralytics.nn.modules.conv.Conv             [64, 64, 3, 2]
+ 20            [-1, 15]  1         0  ultralytics.nn.modules.conv.Concat           [1]
+ 21                  -1  1    123648  ultralytics.nn.modules.block.C2f             [192, 128, 1]
+ 22                  -1  1    147712  ultralytics.nn.modules.conv.Conv             [128, 128, 3, 2]
+ 23            [-1, 12]  1         0  ultralytics.nn.modules.conv.Concat           [1]
+ 24                  -1  1    493056  ultralytics.nn.modules.block.C2f             [384, 256, 1]
+ 25                  -1  1    590336  ultralytics.nn.modules.conv.Conv             [256, 256, 3, 2]
+ 26             [-1, 9]  1         0  ultralytics.nn.modules.conv.Concat           [1]
+ 27                  -1  1   1969152  ultralytics.nn.modules.block.C2f             [768, 512, 1]
+ 28    [18, 21, 24, 27]  1   1420056  ultralytics.nn.modules.head.Detect           [2, 16, None, [64, 128, 256, 512]]
+YOLOv8s_p2 summary: 161 layers, 10,637,496 parameters, 10,637,480 gradients, 37.0 GFLOPs
+
+Transferred 437/437 items from pretrained weights
+Freezing layer 'model.28.dfl.conv.weight'
+[34m[1mAMP: [0mrunning Automatic Mixed Precision (AMP) checks...
+[KDownloading https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo26n.pt to 'yolo26n.pt': 100% ━━━━━━━━━━━━ 5.3MB 260.9MB/s 0.0s
+[34m[1mAMP: [0mchecks passed ✅
+[34m[1mtrain: [0mFast image access ✅ (ping: 0.8±0.1 ms, read: 13.8±9.0 MB/s, size: 121.3 KB)
+[K[34m[1mtrain: [0mScanning /kaggle/input/datasets/dokhang307/dsp-data-optimize/early_fire_smoke_dataset/train/labels... 9102 images, 453 backgrounds, 0 corrupt: 100% ━━━━━━━━━━━━ 9102/9102 161.7it/s 56.3s0.1ss
+WARNING ⚠️ [34m[1mtrain: [0mCache directory /kaggle/input/datasets/dokhang307/dsp-data-optimize/early_fire_smoke_dataset/train is not writable, cache not saved.
+[34m[1malbumentations: [0mBlur(p=0.01, blur_limit=(3, 7)), MedianBlur(p=0.01, blur_limit=(3, 7)), ToGray(p=0.01, method='weighted_average', num_output_channels=3), CLAHE(p=0.01, clip_limit=(1.0, 4.0), tile_grid_size=(8, 8))
+[34m[1mval: [0mFast image access ✅ (ping: 0.3±0.4 ms, read: 10.4±5.3 MB/s, size: 127.9 KB)
+[K[34m[1mval: [0mScanning /kaggle/input/datasets/dokhang307/dsp-data-optimize/early_fire_smoke_dataset/val/labels... 2053 images, 87 backgrounds, 0 corrupt: 100% ━━━━━━━━━━━━ 2053/2053 152.1it/s 13.5s0.1s
+WARNING ⚠️ [34m[1mval: [0mCache directory /kaggle/input/datasets/dokhang307/dsp-data-optimize/early_fire_smoke_dataset/val is not writable, cache not saved.
+[34m[1moptimizer:[0m AdamW(lr=0.001, momentum=0.937) with parameter groups 70 weight(decay=0.0), 79 weight(decay=0.0005), 78 bias(decay=0.0)
+Plotting labels to /kaggle/working/runs/detect/runs/detect/phase1_epoch1-100_20260621_183619/labels.jpg...
+Resuming training /kaggle/input/datasets/dokhang307/dsp-optimize-output-2/runs/detect/runs/detect/phase1_epoch1-100_20260621_183619/weights/last.pt from epoch 87 to 100 total epochs
+
+========================================================================================================================
+TRAINING STARTED — Phase 2 (resumed from epoch 86)
+========================================================================================================================
+  Checkpoint : /kaggle/input/datasets/dokhang307/dsp-optimize-output-2/runs/detect/runs/detect/phase1_epoch1-100_20260621_183619/weights/last.pt
+  Dataset    : /kaggle/working/dataset_corrected.yaml
+  Batch      : 4 | imgsz: 1280
+  Total epochs remaining: 14
+
+========================================================================================================================
+Epoch  │  Train/Box   │  Train/Cls   │  Train/DFL   │  Val/Box   │ Precision  │   Recall   │   mAP50-95
+========================================================================================================================
+Image sizes 1280 train, 1280 val
+Using 2 dataloader workers
+Logging results to [1m/kaggle/working/runs/detect/runs/detect/phase1_epoch1-100_20260621_183619[0m
+Starting training for 100 epochs...
+
+      Epoch    GPU_mem   box_loss   cls_loss   dfl_loss  Instances       Size
+[K     87/100      5.62G     0.3539     0.2695     0.9197         11       1280: 100% ━━━━━━━━━━━━ 2276/2276 2.4it/s 15:340.4ss
+ 87/100 │     0.487702 │     0.304309 │     0.951805 │   0.000000 │     0.0000 │     0.0000 │       0.0000
+[K                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95): 100% ━━━━━━━━━━━━ 257/257 4.9it/s 52.7s0.2ss
+                   all       2053       4845       0.99      0.961       0.98      0.891
+
+      Epoch    GPU_mem   box_loss   cls_loss   dfl_loss  Instances       Size
+[K     88/100      5.71G     0.3547     0.2674     0.9165          9       1280: 100% ━━━━━━━━━━━━ 2276/2276 2.4it/s 15:360.3ss
+ 88/100 │     0.271235 │     0.212074 │     0.846048 │   0.403920 │     0.9902 │     0.9609 │       0.8907
+[K                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95): 100% ━━━━━━━━━━━━ 257/257 5.1it/s 50.9s0.2ss
+                   all       2053       4845       0.99      0.961       0.98      0.891
+
+      Epoch    GPU_mem   box_loss   cls_loss   dfl_loss  Instances       Size
+[K     89/100      5.71G     0.3543      0.266     0.9151         15       1280: 100% ━━━━━━━━━━━━ 2276/2276 2.4it/s 15:370.3ss
+ 89/100 │     0.469322 │     0.485582 │     1.069893 │   0.403990 │     0.9905 │     0.9611 │       0.8907
+[K                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95): 100% ━━━━━━━━━━━━ 257/257 5.0it/s 51.0s0.2ss
+                   all       2053       4845       0.99      0.961       0.98      0.891
+
+      Epoch    GPU_mem   box_loss   cls_loss   dfl_loss  Instances       Size
+[K     90/100      5.83G     0.3539      0.267     0.9156          4       1280: 100% ━━━━━━━━━━━━ 2276/2276 2.4it/s 15:370.3ss
+ 90/100 │     0.186181 │     0.144495 │     0.646079 │   0.403920 │     0.9902 │     0.9612 │       0.8906
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Epoch 90 Summary:
+  937.2s | P=0.9902 R=0.9612 mAP50=0.9803 mAP50-95=0.8906
+  ⭐ New best: mAP50-95=0.8906
+  GPU mem: 0.37 GB
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+[K                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95): 100% ━━━━━━━━━━━━ 257/257 5.1it/s 50.8s0.2ss
+                   all       2053       4845      0.989      0.961       0.98      0.891
+Closing dataloader mosaic
+[34m[1malbumentations: [0mBlur(p=0.01, blur_limit=(3, 7)), MedianBlur(p=0.01, blur_limit=(3, 7)), ToGray(p=0.01, method='weighted_average', num_output_channels=3), CLAHE(p=0.01, clip_limit=(1.0, 4.0), tile_grid_size=(8, 8))
+
+      Epoch    GPU_mem   box_loss   cls_loss   dfl_loss  Instances       Size
+[K     91/100       5.4G     0.3579     0.2149     0.8366          3       1280: 100% ━━━━━━━━━━━━ 2276/2276 2.5it/s 15:280.3ss
+ 91/100 │     0.572416 │     0.241408 │     0.634341 │   0.403710 │     0.9894 │     0.9607 │       0.8909
+[K                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95): 100% ━━━━━━━━━━━━ 257/257 5.1it/s 50.9s0.2ss
+                   all       2053       4845       0.99       0.96       0.98      0.891
+
+      Epoch    GPU_mem   box_loss   cls_loss   dfl_loss  Instances       Size
+[K     92/100       5.4G     0.3513     0.2098     0.8313         11       1280: 100% ━━━━━━━━━━━━ 2276/2276 2.5it/s 15:270.3ss
+ 92/100 │     0.368116 │     0.317654 │     0.883505 │   0.403800 │     0.9902 │     0.9602 │       0.8908
+[K                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95): 100% ━━━━━━━━━━━━ 257/257 5.0it/s 50.9s0.2ss
+                   all       2053       4845      0.989      0.961       0.98      0.891
+
+      Epoch    GPU_mem   box_loss   cls_loss   dfl_loss  Instances       Size
+[K     93/100      5.33G     0.3487      0.208     0.8282          2       1280: 100% ━━━━━━━━━━━━ 2276/2276 2.5it/s 15:270.3ss
+ 93/100 │     0.403642 │     0.324608 │     1.054736 │   0.403980 │     0.9890 │     0.9612 │       0.8913
+[K                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95): 100% ━━━━━━━━━━━━ 257/257 5.0it/s 51.1s0.2ss
+                   all       2053       4845      0.989      0.961       0.98      0.891
+
+      Epoch    GPU_mem   box_loss   cls_loss   dfl_loss  Instances       Size
+[K     94/100      5.49G      0.352     0.2085      0.833          6       1280: 100% ━━━━━━━━━━━━ 2276/2276 2.5it/s 15:270.3ss
+ 94/100 │     0.312984 │     0.230900 │     0.809120 │   0.404510 │     0.9887 │     0.9608 │       0.8912
+[K                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95): 100% ━━━━━━━━━━━━ 257/257 5.0it/s 50.9s0.2ss
+                   all       2053       4845      0.988      0.961       0.98      0.891
+
+      Epoch    GPU_mem   box_loss   cls_loss   dfl_loss  Instances       Size
+[K     95/100      5.41G     0.3491     0.2055     0.8302          5       1280: 100% ━━━━━━━━━━━━ 2276/2276 2.5it/s 15:270.3ss
+ 95/100 │     0.130271 │     0.105731 │     0.791509 │   0.404310 │     0.9876 │     0.9611 │       0.8913
+[K                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95): 100% ━━━━━━━━━━━━ 257/257 5.1it/s 50.8s0.2ss
+                   all       2053       4845      0.987      0.961       0.98      0.891
+
+      Epoch    GPU_mem   box_loss   cls_loss   dfl_loss  Instances       Size
+[K     96/100       5.4G      0.348     0.2053     0.8302          3       1280: 100% ━━━━━━━━━━━━ 2276/2276 2.5it/s 15:270.3ss
+ 96/100 │     0.469461 │     0.174643 │     0.806816 │   0.404660 │     0.9875 │     0.9608 │       0.8914
+[K                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95): 100% ━━━━━━━━━━━━ 257/257 5.1it/s 50.8s0.2ss
+                   all       2053       4845      0.988       0.96       0.98      0.891
+
+      Epoch    GPU_mem   box_loss   cls_loss   dfl_loss  Instances       Size
+[K     97/100      5.48G     0.3456     0.2032     0.8294          7       1280: 100% ━━━━━━━━━━━━ 2276/2276 2.5it/s 15:280.3ss
+ 97/100 │     0.541230 │     0.242552 │     0.677876 │   0.404910 │     0.9884 │     0.9600 │       0.8914
+[K                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95): 100% ━━━━━━━━━━━━ 257/257 5.0it/s 50.9s0.2ss
+                   all       2053       4845      0.988      0.961       0.98       0.89
+
+      Epoch    GPU_mem   box_loss   cls_loss   dfl_loss  Instances       Size
+[K     98/100      5.48G     0.3466     0.2039      0.831          4       1280: 100% ━━━━━━━━━━━━ 2276/2276 2.4it/s 15:290.3ss
+ 98/100 │     0.170204 │     0.151727 │     0.865798 │   0.405330 │     0.9877 │     0.9609 │       0.8904
+[K                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95): 100% ━━━━━━━━━━━━ 257/257 5.1it/s 50.9s0.2ss
+                   all       2053       4845      0.987      0.963       0.98       0.89
+
+      Epoch    GPU_mem   box_loss   cls_loss   dfl_loss  Instances       Size
+[K     99/100      5.49G     0.3457     0.2026     0.8279          6       1280: 100% ━━━━━━━━━━━━ 2276/2276 2.4it/s 15:290.3ss
+ 99/100 │     0.611706 │     0.309613 │     0.847426 │   0.405020 │     0.9866 │     0.9629 │       0.8905
+[K                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95): 100% ━━━━━━━━━━━━ 257/257 5.0it/s 51.0s0.2ss
+                   all       2053       4845      0.987      0.963       0.98      0.891
+
+      Epoch    GPU_mem   box_loss   cls_loss   dfl_loss  Instances       Size
+[K    100/100      5.49G      0.344     0.2012     0.8249         10       1280: 100% ━━━━━━━━━━━━ 2276/2276 2.5it/s 15:280.3ss
+100/100 │     0.375323 │     0.277709 │     0.884686 │   0.405350 │     0.9866 │     0.9626 │       0.8911
+
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Epoch 100 Summary:
+  927.5s | P=0.9866 R=0.9626 mAP50=0.9796 mAP50-95=0.8911
+  ⭐ New best: mAP50-95=0.8911
+  GPU mem: 0.37 GB
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+[K                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95): 100% ━━━━━━━━━━━━ 257/257 5.0it/s 50.9s0.2ss
+                   all       2053       4845      0.987      0.962       0.98      0.891
+
+14 epochs completed in 3.820 hours.
+Optimizer stripped from /kaggle/working/runs/detect/runs/detect/phase1_epoch1-100_20260621_183619/weights/last.pt, 22.0MB
+Optimizer stripped from /kaggle/working/runs/detect/runs/detect/phase1_epoch1-100_20260621_183619/weights/best.pt, 22.0MB
+
+Validating /kaggle/working/runs/detect/runs/detect/phase1_epoch1-100_20260621_183619/weights/best.pt...
+Ultralytics 8.4.78 🚀 Python-3.12.13 torch-2.10.0+cu128 CUDA:0 (Tesla T4, 14912MiB)
+YOLOv8s_p2 summary (fused): 91 layers, 10,626,968 parameters, 0 gradients, 36.6 GFLOPs
+[K                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95): 100% ━━━━━━━━━━━━ 257/257 5.9it/s 43.4s0.2ss
+                   all       2053       4845      0.988       0.96       0.98      0.891
+            Early_Fire       1108       2885      0.981      0.928      0.965      0.854
+           Early_Smoke       1768       1960      0.995      0.993      0.995      0.929
+Speed: 0.5ms preprocess, 16.7ms inference, 0.0ms loss, 1.0ms postprocess per image
+Results saved to [1m/kaggle/working/runs/detect/runs/detect/phase1_epoch1-100_20260621_183619[0m
+101/100 │     0.375323 │     0.277709 │     0.884686 │   0.000000 │     0.9880 │     0.9603 │       0.8914
+
+========================================================================================================================
+Phase 2 COMPLETE
+========================================================================================================================
+  Best mAP50-95 : 0.8911
+  Best weights  : /kaggle/working/runs/detect/runs/detect/phase1_epoch1-100_20260621_183619/weights/best.pt
+  Last weights  : /kaggle/working/runs/detect/runs/detect/phase1_epoch1-100_20260621_183619/weights/last.pt
+  ✓ best.pt uploaded to W&B artifacts
+
+[Saving Phase 2 checkpoint for Phase 3...]
+  ✓ last.pt (22.0 MB)
+  ✓ best.pt (22.0 MB)
+  ✓ results.csv
+  ✓ args.yaml
+
+✓ Checkpoint saved to: /kaggle/working/phase2_checkpoint
+  Next: add this notebook output as Kaggle dataset "phase2-checkpoint"
+  Then create Phase 3 notebook pointing to that checkpoint
