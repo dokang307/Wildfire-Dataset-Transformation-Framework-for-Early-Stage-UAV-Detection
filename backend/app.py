@@ -39,7 +39,7 @@ print("Model loaded successfully!")
 @app.route("/health", methods=["GET"])
 def health():
     """Health check endpoint for Cloud Run."""
-    return jsonify({"status": "healthy", "model": "YOLOv11n-wildfire-onnx"})
+    return jsonify({"status": "healthy", "model": "YOLOv8s-P2-wildfire-onnx"})
 
 
 # --- Model Info ---
@@ -47,7 +47,7 @@ def health():
 def model_info():
     """Return model metadata."""
     return jsonify({
-        "model": "YOLOv11n",
+        "model": "YOLOv8s-P2",
         "format": "ONNX",
         "classes": CLASS_NAMES,
         "input_size": f"{detector.input_width}x{detector.input_height}",

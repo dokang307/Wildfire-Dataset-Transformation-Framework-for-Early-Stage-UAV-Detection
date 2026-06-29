@@ -2,13 +2,13 @@
 
 ## Background & Project Research Findings
 
-This project trains a **YOLOv11n (YOLO26n)** object detection model to detect **Early_Fire** and **Early_Smoke** from UAV aerial imagery for wildfire early warning.
+This project trains a **YOLOv8s-P2** object detection model to detect **Early_Fire** and **Early_Smoke** from UAV aerial imagery for wildfire early warning.
 
 ### Training Summary
 
 | Parameter | Value |
 |---|---|
-| **Model** | YOLOv11n (`yolo26n.pt` base) |
+| **Model** | YOLOv8s-P2 |
 | **Task** | Object Detection |
 | **Classes** | `Early_Fire`, `Early_Smoke` (2 classes) |
 | **Image Size** | 1280×1280 |
@@ -108,7 +108,7 @@ Local utility script to convert `best.pt` → `best.onnx`:
 Comprehensive project README (also serves as landing page content source):
 - Project abstract & motivation for UAV-based wildfire early detection
 - Dataset description (2 classes, ~21K instances)
-- Model architecture (YOLOv11n) & training pipeline
+- Model architecture (YOLOv8s-P2) & training pipeline
 - Key performance metrics table
 - Embedded training result figures from `phase1_epoch1-100_20260621_183619/`
 - Project timeline

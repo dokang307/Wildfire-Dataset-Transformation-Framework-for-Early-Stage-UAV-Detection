@@ -1,6 +1,6 @@
 # 🔥 UAV Wildfire Early Detection System
 
-> **Real-time Early Fire & Smoke Detection from UAV Aerial Imagery using YOLOv11**
+> **Real-time Early Fire & Smoke Detection from UAV Aerial Imagery using YOLOv8s-P2**
 
 [![Python](https://img.shields.io/badge/Python-3.12-blue.svg)](https://python.org)
 [![YOLO](https://img.shields.io/badge/YOLOv8s--P2-Ultralytics-purple.svg)](https://docs.ultralytics.com)
@@ -136,8 +136,8 @@ The model is trained on 13,862 early-stage training images synthesized from a so
 ┌─────────────────────────────┐      HTTPS API       ┌──────────────────────────────┐
 │   FRONTEND                  │ ◄──────────────────►  │    BACKEND                   │
 │                             │                       │                              │
-│   Firebase Hosting          │   POST /api/detect/*  │    Flask + ONNX Runtime      │
-│   Static SPA                │   GET  /api/model-info│    best.onnx (YOLOv8s-P2)    │
+│   Vite + Tailwind CSS v4    │   POST /api/detect/*  │    Flask + ONNX Runtime      │
+│   Firebase Hosting          │   GET  /api/model-info│    best.onnx (YOLOv8s-P2)    │
 │   Static SPA                │                       │    Google Cloud Run          │
 └─────────────────────────────┘                       └──────────────────────────────┘
 ```

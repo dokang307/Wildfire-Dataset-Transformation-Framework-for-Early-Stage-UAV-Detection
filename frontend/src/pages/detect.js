@@ -24,7 +24,7 @@ export function renderDetect(container) {
         <span class="gradient-text">Wildfire Detection</span>
       </h1>
       <p class="text-text-secondary text-lg max-w-xl mx-auto">
-        Upload an image or video and our YOLOv11 model will detect early signs of fire and smoke.
+        Upload an image or video and our YOLOv8s-P2 model will detect early signs of fire and smoke.
       </p>
     </div>
 

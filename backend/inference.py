@@ -1,5 +1,5 @@
 """
-ONNX Runtime inference engine for YOLOv11 wildfire detection.
+ONNX Runtime inference engine for YOLOv8s-P2 wildfire detection.
 Pure ONNX Runtime — no PyTorch dependency at runtime.
 """
 
@@ -23,7 +23,7 @@ DEFAULT_IOU_THRESHOLD = 0.7
 
 
 class OnnxDetector:
-    """YOLOv11 object detector using ONNX Runtime."""
+    """YOLOv8s-P2 object detector using ONNX Runtime."""
 
     def __init__(self, model_path: str, conf_threshold: float = DEFAULT_CONFIDENCE,
                  iou_threshold: float = DEFAULT_IOU_THRESHOLD):

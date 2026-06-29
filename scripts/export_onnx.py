@@ -1,5 +1,5 @@
 """
-Export YOLOv11n best.pt to ONNX format for optimized inference.
+Export YOLOv8s-P2 best.pt to ONNX format for optimized inference.
 
 Run this script inside the export virtual environment:
     .\.venv\Scripts\Activate.ps1
