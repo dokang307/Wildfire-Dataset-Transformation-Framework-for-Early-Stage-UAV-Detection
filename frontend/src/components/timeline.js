@@ -8,28 +8,28 @@ const MILESTONES = [
     icon: "📋",
     title: "Project Planning",
     description:
-      "Problem definition, literature review, dataset sourcing, and selection of YOLOv11 architecture for real-time UAV-based wildfire detection.",
+      "Problem definition, literature review, dataset sourcing, and selection of YOLOv8s-P2 architecture for real-time UAV-based early wildfire detection.",
   },
   {
     date: "June 2026 — Week 2",
     icon: "📦",
     title: "Data Preparation",
     description:
-      "Curated a dataset of 20,939 annotated instances across 2 classes (Early_Fire & Early_Smoke). Performed annotation validation, quality checks, and train/val/test splitting.",
+      "Processed 21,527 source images through the Early-Stage Fire Simulation Augmentation (EFSA) pipeline, synthesizing 13,862 high-quality early-stage training images.",
   },
   {
     date: "June 21, 2026",
     icon: "🚀",
     title: "Phase 1 — Model Training",
     description:
-      "Trained YOLOv11n for 100 epochs on Kaggle (2× Tesla T4 GPUs) with 1280×1280 resolution. Achieved 98.0% mAP@50 and 89.1% mAP@50-95 with AdamW optimizer and cosine LR schedule.",
+      "Trained YOLOv8s augmented with a P2 detection head for 100 epochs on Kaggle (2× Tesla T4 GPUs). Achieved 97.7% mAP@50 and 90.0% mAP@50-95 on the EFSA test set.",
   },
   {
     date: "June 26, 2026",
     icon: "🔄",
     title: "Phase 2 — Fine-tuning",
     description:
-      "Resumed training with optimized hyperparameters for further convergence. Monitored via Weights & Biases. Final F1 score: 0.97 at confidence threshold 0.38.",
+      "Resumed training with optimized hyperparameters for further convergence. Evaluated real-world generalization on unseen incipient fire footage.",
   },
   {
     date: "June 27, 2026",
