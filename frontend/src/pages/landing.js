@@ -8,10 +8,10 @@ import { createTimeline } from "../components/timeline.js";
    METRICS DATA
    ============================================ */
 const METRICS = [
-  { label: "Precision", value: 98.68, suffix: "%", icon: "🎯" },
-  { label: "Recall", value: 96.16, suffix: "%", icon: "📡" },
-  { label: "mAP@50", value: 97.97, suffix: "%", icon: "📊" },
-  { label: "F1 Score", value: 0.97, suffix: "", icon: "⚡" },
+  { label: "Precision", value: 99.10, suffix: "%", icon: "🎯" },
+  { label: "Recall", value: 95.90, suffix: "%", icon: "📡" },
+  { label: "mAP@50", value: 97.70, suffix: "%", icon: "📊" },
+  { label: "mAP@50-95", value: 90.00, suffix: "%", icon: "⚡" },
 ];
 
 /* ============================================
@@ -56,7 +56,7 @@ export function renderLanding(container) {
       <div class="animate-fade-in-up">
         <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 border border-accent/30 mb-8">
           <span class="w-2 h-2 rounded-full bg-ember animate-pulse"></span>
-          <span class="text-sm font-medium text-accent-light">YOLOv11n • ONNX Optimized</span>
+          <span class="text-sm font-medium text-accent-light">YOLOv8s-P2 • EFSA Pipeline</span>
         </div>
       </div>
 
@@ -67,7 +67,7 @@ export function renderLanding(container) {
 
       <p class="text-lg md:text-xl text-text-secondary max-w-2xl mx-auto mb-10 leading-relaxed animate-fade-in-up-delay-2">
         Real-time detection of early fire and smoke from UAV aerial imagery
-        using deep learning. Achieving <span class="text-ember font-semibold">97.97% mAP@50</span> with
+        using deep learning. Achieving <span class="text-ember font-semibold">97.70% mAP@50</span> with
         optimized ONNX inference.
       </p>
 
@@ -115,8 +115,7 @@ export function renderLanding(container) {
           designed to operate on imagery captured by <span class="text-text-primary font-semibold">Unmanned Aerial Vehicles (UAVs)</span>.
         </p>
         <p class="text-text-secondary leading-relaxed text-lg mb-6">
-          We leverage the <span class="text-ember font-semibold">YOLOv11n</span> (nano) architecture — a state-of-the-art
-          real-time object detection model — fine-tuned to identify two critical early indicators of wildfire:
+          We leverage the <span class="text-ember font-semibold">YOLOv8s</span> architecture augmented with a <span class="text-text-primary font-semibold">P2 detection head</span> — providing 4× higher spatial resolution for small objects — fine-tuned to identify two critical early indicators of wildfire:
         </p>
         <div class="grid sm:grid-cols-2 gap-4 mb-6">
           <div class="flex items-center gap-4 p-4 rounded-xl bg-bg-tertiary border border-border">
@@ -135,7 +134,7 @@ export function renderLanding(container) {
           </div>
         </div>
         <p class="text-text-secondary leading-relaxed text-lg">
-          The model is trained on a curated dataset of <span class="text-text-primary font-semibold">20,939 annotated instances</span>
+          The model is trained on a synthetic dataset of <span class="text-text-primary font-semibold">13,862 early-stage images</span> generated via the <span class="text-text-primary font-semibold">Early-Stage Fire Simulation Augmentation (EFSA)</span> pipeline, 
           and optimized for deployment using <span class="text-text-primary font-semibold">ONNX Runtime</span>,
           enabling efficient inference on cloud platforms and edge devices.
         </p>
@@ -156,7 +155,7 @@ export function renderLanding(container) {
     
     <div class="relative z-10 max-w-5xl mx-auto">
       <h2 class="section-title text-center gradient-text">Performance Metrics</h2>
-      <p class="section-subtitle text-center">Best checkpoint results on validation set</p>
+      <p class="section-subtitle text-center">Evaluation on the held-out EFSA test set</p>
 
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6" id="metrics-grid">
         ${METRICS.map(
@@ -224,7 +223,7 @@ export function renderLanding(container) {
   footer.innerHTML = `
     <div class="max-w-5xl mx-auto text-center">
       <p class="text-text-muted text-sm">
-        UAV Wildfire Early Detection System • Built with YOLOv11 + ONNX Runtime
+        UAV Wildfire Early Detection System • Built with YOLOv8s-P2 + ONNX Runtime
       </p>
       <p class="text-text-muted text-xs mt-2">
         © 2026 DSP-UAV Project

@@ -3,7 +3,7 @@
 > **Real-time Early Fire & Smoke Detection from UAV Aerial Imagery using YOLOv11**
 
 [![Python](https://img.shields.io/badge/Python-3.12-blue.svg)](https://python.org)
-[![YOLO](https://img.shields.io/badge/YOLOv11n-Ultralytics-purple.svg)](https://docs.ultralytics.com)
+[![YOLO](https://img.shields.io/badge/YOLOv8s--P2-Ultralytics-purple.svg)](https://docs.ultralytics.com)
 [![ONNX](https://img.shields.io/badge/ONNX-Runtime-orange.svg)](https://onnxruntime.ai)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
@@ -13,24 +13,23 @@
 
 Wildfires pose an increasing threat to ecosystems, communities, and infrastructure worldwide. Early detection is critical to minimizing damage and enabling rapid response. This project presents a **deep learning–based wildfire early detection system** designed to operate on imagery captured by **Unmanned Aerial Vehicles (UAVs)**.
 
-We leverage the **YOLOv11n** (nano) architecture — a state-of-the-art real-time object detection model — fine-tuned to identify two critical early indicators of wildfire:
+We leverage the **YOLOv8s** (small) architecture augmented with a **P2 detection head** (providing 4× higher spatial resolution for small objects) — fine-tuned to identify two critical early indicators of wildfire:
 
 - 🔴 **Early Fire** — nascent flame regions visible from aerial perspectives
-- 🟠 **Early Smoke** — smoke plumes indicative of fire ignition or smoldering
+- 🟠 **Early Smoke** — smoke plumes indicative of fire ignition
 
-The system achieves **97.97% mAP@50** and **89.11% mAP@50-95** on our validation set, demonstrating robust detection capability across diverse environmental conditions. The model is optimized for deployment using **ONNX Runtime**, enabling efficient inference on both edge devices and cloud platforms.
+The model is trained on a synthetic dataset generated via the **Early-Stage Fire Simulation Augmentation (EFSA)** pipeline. On the held-out test set, it achieves **97.70% mAP@50** and **90.00% mAP@50-95**, demonstrating robust detection capability for incipient events. The model is optimized for deployment using **ONNX Runtime**, enabling efficient inference on both edge devices and cloud platforms.
 
 ---
 
 ## Dataset
 
-The training dataset comprises UAV aerial imagery annotated with bounding boxes for two classes:
+The model is trained on 13,862 early-stage training images synthesized from a source dataset of 21,527 images using the EFSA pipeline. The classes are:
 
-| Class | Instances | Description |
-|---|---|---|
-| **Early_Fire** | 12,139 | Early-stage flame regions |
-| **Early_Smoke** | 8,800 | Smoke plumes from fire ignition |
-| **Total** | **20,939** | — |
+| Class | Description |
+|---|---|
+| **Early_Fire** | Early-stage flame regions (low luminance, desaturated) |
+| **Early_Smoke** | Nascent smoke plumes (low spatial density, semi-transparent) |
 
 ### Label Distribution
 
@@ -41,7 +40,7 @@ The training dataset comprises UAV aerial imagery annotated with bounding boxes 
 ## Model Architecture & Training
 
 ### Architecture
-- **Base Model**: YOLOv11n (nano variant) — optimized for real-time inference
+- **Base Model**: YOLOv8s (small variant) augmented with a P2 detection head
 - **Input Resolution**: 1280×1280 pixels
 - **Pre-trained**: Yes (COCO weights → fine-tuned on wildfire dataset)
 
@@ -71,22 +70,22 @@ The training dataset comprises UAV aerial imagery annotated with bounding boxes 
 
 ## Performance Metrics
 
-### Final Results (Best Checkpoint)
+### Test Set Results
 
 | Metric | Value |
 |---|---|
-| **Precision** | 98.68% |
-| **Recall** | 96.16% |
-| **mAP@50** | 97.97% |
-| **mAP@50-95** | 89.11% |
+| **Precision** | 99.10% |
+| **Recall** | 95.90% |
+| **mAP@50** | 97.70% |
+| **mAP@50-95** | 90.00% |
 | **F1 Score** | 0.97 @ confidence=0.380 |
 
 ### Per-Class Performance
 
 | Class | AP@50 | Precision | Recall |
 |---|---|---|---|
-| **Early_Fire** | 96.5% | ~98.7% | ~94.0% |
-| **Early_Smoke** | 99.5% | ~98.7% | ~99.5% |
+| **Early_Fire** | 86.5% | — | — |
+| **Early_Smoke** | 93.6% | — | — |
 
 ### Training Curves
 
@@ -124,7 +123,7 @@ The training dataset comprises UAV aerial imagery annotated with bounding boxes 
 |---|---|---|
 | **June 2026 – Week 1** | 📋 Project Planning | Problem definition, dataset sourcing, architecture selection |
 | **June 2026 – Week 2** | 📦 Data Preparation | Dataset curation, annotation validation, train/val/test split |
-| **June 21, 2026** | 🚀 Phase 1 Training | YOLOv11n training (100 epochs) on Kaggle with 2× Tesla T4 |
+| **June 21, 2026** | 🚀 Phase 1 Training | YOLOv8s-P2 training on Kaggle with 2× Tesla T4 |
 | **June 26, 2026** | 🔄 Phase 2 Fine-tuning | Resumed training with optimized hyperparameters |
 | **June 27, 2026** | 🌐 Web Demo & Deployment | ONNX optimization, Flask API backend, Vite frontend |
 | **June 27, 2026** | ☁️ Cloud Deployment | Backend on Google Cloud Run, Frontend on Firebase Hosting |
@@ -137,8 +136,8 @@ The training dataset comprises UAV aerial imagery annotated with bounding boxes 
 ┌─────────────────────────────┐      HTTPS API       ┌──────────────────────────────┐
 │   FRONTEND                  │ ◄──────────────────►  │    BACKEND                   │
 │                             │                       │                              │
-│   Vite + Tailwind CSS v4    │   POST /api/detect/*  │    Flask + ONNX Runtime      │
-│   Firebase Hosting          │   GET  /api/model-info│    best.onnx (YOLOv11n)      │
+│   Firebase Hosting          │   POST /api/detect/*  │    Flask + ONNX Runtime      │
+│   Static SPA                │   GET  /api/model-info│    best.onnx (YOLOv8s-P2)    │
 │   Static SPA                │                       │    Google Cloud Run          │
 └─────────────────────────────┘                       └──────────────────────────────┘
 ```
@@ -199,6 +198,6 @@ This project is developed for academic and research purposes.
 
 ## Acknowledgments
 
-- [Ultralytics](https://ultralytics.com/) for the YOLOv11 architecture
+- [Ultralytics](https://ultralytics.com/) for the YOLOv8 architecture
 - [ONNX Runtime](https://onnxruntime.ai/) for optimized inference
 - [Kaggle](https://kaggle.com/) for compute resources
