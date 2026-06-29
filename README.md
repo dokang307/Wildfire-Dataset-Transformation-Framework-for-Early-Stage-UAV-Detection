@@ -1,6 +1,6 @@
 # 🔥 UAV Wildfire Early Detection System
 
-> **Real-time Early Fire & Smoke Detection from UAV Aerial Imagery using YOLOv8s-P2**
+> **Real-time Early Fire & Smoke Detection from UAV Aerial Imagery using YOLOv11**
 
 [![Python](https://img.shields.io/badge/Python-3.12-blue.svg)](https://python.org)
 [![YOLO](https://img.shields.io/badge/YOLOv8s--P2-Ultralytics-purple.svg)](https://docs.ultralytics.com)
