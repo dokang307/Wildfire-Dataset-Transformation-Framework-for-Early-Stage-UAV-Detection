@@ -194,8 +194,8 @@ def detect_video():
         # Limit video length (max ~30 seconds of processed frames)
         max_frames = int(30 * fps)
 
-        # Setup video writer
-        fourcc = cv2.VideoWriter_fourcc(*"mp4v")
+        # Setup video writer (use avc1 for H.264 HTML5 video support)
+        fourcc = cv2.VideoWriter_fourcc(*"avc1")
         writer = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
 
         frame_idx = 0

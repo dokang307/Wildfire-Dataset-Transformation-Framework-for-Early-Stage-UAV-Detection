@@ -18,12 +18,7 @@ def main():
     project_root = Path(__file__).resolve().parent.parent
     weights_path = (
         project_root
-        / "runs"
-        / "detect"
-        / "runs"
-        / "detect"
-        / "phase1_epoch1-100_20260621_183619"
-        / "weights"
+        / "phase2_checkpoint"
         / "best.pt"
     )
     output_dir = project_root / "backend" / "model"

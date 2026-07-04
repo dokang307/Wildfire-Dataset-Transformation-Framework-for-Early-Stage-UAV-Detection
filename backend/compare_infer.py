@@ -6,7 +6,7 @@ import sys
 
 def main(image_path):
     print("=== PyTorch (Ultralytics) ===")
-    pt_model = YOLO('../runs/detect/runs/detect/phase1_epoch1-100_20260621_183619/weights/best.pt')
+    pt_model = YOLO('../phase2_checkpoint/best.pt')
     results = pt_model(image_path, imgsz=1280, conf=0.01)
     pt_boxes = results[0].boxes
     print(f"PT found {len(pt_boxes)} detections.")
