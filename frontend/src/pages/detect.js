@@ -102,6 +102,16 @@ export function renderDetect(container) {
                 <img id="result-img" class="max-w-full max-h-[500px] block" src="" alt="Detection result" />
               </div>
             </div>
+            <!-- Direction result -->
+            <div id="direction-result" class="hidden mb-3 p-3 rounded-lg bg-bg-tertiary border border-border flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center text-accent-light text-xl">🧭</div>
+                <div>
+                  <p class="text-sm font-semibold text-text-primary">Spread Direction</p>
+                  <p class="text-xs text-text-muted"><span id="dir-angle" class="font-bold text-accent-light"></span> <span id="dir-conf-wrap">(Conf: <span id="dir-conf"></span>)</span></p>
+                </div>
+              </div>
+            </div>
             <!-- Detection list -->
             <div id="detection-list" class="space-y-2 max-h-48 overflow-y-auto"></div>
           </div>
@@ -244,6 +254,21 @@ export function renderDetect(container) {
         page.querySelector("#result-time").textContent =
           `${data.processing_time}s`;
 
+        // Show Direction Result
+        const dirResult = page.querySelector("#direction-result");
+        if (data.direction_confidence >= 0.2 && data.direction_angle !== null) {
+          page.querySelector("#dir-angle").textContent = Math.round(data.direction_angle) + "°";
+          page.querySelector("#dir-conf").textContent = data.direction_confidence.toFixed(2);
+          page.querySelector("#dir-conf-wrap").style.display = "inline";
+          dirResult.classList.remove("hidden");
+        } else if (data.direction_confidence !== undefined) {
+          page.querySelector("#dir-angle").textContent = "Undetermined";
+          page.querySelector("#dir-conf-wrap").style.display = "none";
+          dirResult.classList.remove("hidden");
+        } else {
+          dirResult.classList.add("hidden");
+        }
+
         // Add interactive hover overlays
         const container = page.querySelector("#result-image-container");
         // Remove old overlays
@@ -266,7 +291,7 @@ export function renderDetect(container) {
           overlay.style.width = `${w}%`;
           overlay.style.height = `${h}%`;
 
-          const color = d.class === "Early_Fire" ? "#ef4444" : "#f97316";
+          const color = d.class === "fire" ? "#ef4444" : "#f97316";
           overlay.innerHTML = `
             <div class="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-[#1a1313] border border-white/10 text-white px-2 py-1 rounded text-xs whitespace-nowrap shadow-xl pointer-events-none z-20 font-mono">
               <span class="font-bold" style="color: ${color}">${d.class}</span> 
@@ -289,7 +314,7 @@ export function renderDetect(container) {
             .map(
               (d) => `
             <div class="flex items-center gap-3 p-3 rounded-lg bg-bg-tertiary">
-              <span class="w-3 h-3 rounded-full flex-shrink-0" style="background: ${d.class === "Early_Fire" ? "#dc2626" : "#f97316"}"></span>
+              <span class="w-3 h-3 rounded-full flex-shrink-0" style="background: ${d.class === "fire" ? "#dc2626" : "#f97316"}"></span>
               <span class="text-sm font-medium text-text-primary flex-1">${d.class}</span>
               <span class="text-xs font-mono text-accent-light">${(d.confidence * 100).toFixed(1)}%</span>
               <span class="text-xs font-mono text-text-muted">[${d.bbox.join(", ")}]</span>

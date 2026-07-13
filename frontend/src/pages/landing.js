@@ -8,28 +8,18 @@ import { createTimeline } from "../components/timeline.js";
    METRICS DATA
    ============================================ */
 const METRICS = [
-  { label: "Precision", value: 99.10, suffix: "%", icon: "🎯" },
-  { label: "Recall", value: 95.90, suffix: "%", icon: "📡" },
-  { label: "mAP@50", value: 97.70, suffix: "%", icon: "📊" },
-  { label: "mAP@50-95", value: 90.00, suffix: "%", icon: "⚡" },
+  { label: "Precision", value: 85.7, suffix: "%", icon: "🎯" },
+  { label: "Recall", value: 82.6, suffix: "%", icon: "📡" },
+  { label: "mAP@50", value: 82.6, suffix: "%", icon: "📊" },
+  { label: "FPS", value: 133, suffix: "", icon: "⚡" },
 ];
 
 /* ============================================
    GALLERY IMAGES
    ============================================ */
 const GALLERY_IMAGES = [
-  { src: "/figures/results.png", label: "Training Results" },
-  { src: "/figures/BoxPR_curve.png", label: "Precision-Recall Curve" },
-  { src: "/figures/BoxF1_curve.png", label: "F1-Confidence Curve" },
-  { src: "/figures/confusion_matrix.png", label: "Confusion Matrix" },
-  {
-    src: "/figures/confusion_matrix_normalized.png",
-    label: "Normalized Confusion Matrix",
-  },
-  { src: "/figures/labels.jpg", label: "Label Distribution" },
-  { src: "/figures/val_batch0_pred.jpg", label: "Validation Predictions 1" },
-  { src: "/figures/val_batch1_pred.jpg", label: "Validation Predictions 2" },
-  { src: "/figures/val_batch2_pred.jpg", label: "Validation Predictions 3" },
+  { src: "/figures/fig_spread.png", label: "Direction Estimation" },
+  { src: "/figures/fig_train_and_fps.png", label: "Training and FPS" },
 ];
 
 /* ============================================
@@ -56,19 +46,18 @@ export function renderLanding(container) {
       <div class="animate-fade-in-up">
         <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 border border-accent/30 mb-8">
           <span class="w-2 h-2 rounded-full bg-ember animate-pulse"></span>
-          <span class="text-sm font-medium text-accent-light">YOLOv8s-P2 • EFSA Pipeline</span>
+          <span class="text-sm font-medium text-accent-light">YOLOv8s • Wind-Sensor-Free Pipeline</span>
         </div>
       </div>
 
       <h1 class="font-display font-900 text-5xl md:text-7xl lg:text-8xl leading-tight mb-6 animate-fade-in-up-delay-1">
-        <span class="text-text-primary">UAV Wildfire</span><br />
-        <span class="gradient-text">Early Detection</span>
+        <span class="text-text-primary">Wildfire Spread</span><br />
+        <span class="gradient-text">Direction Estimation</span>
       </h1>
 
       <p class="text-lg md:text-xl text-text-secondary max-w-2xl mx-auto mb-10 leading-relaxed animate-fade-in-up-delay-2">
-        Real-time detection of early fire and smoke from UAV aerial imagery
-        using deep learning. Achieving <span class="text-ember font-semibold">97.70% mAP@50</span> with
-        optimized ONNX inference.
+        Estimating wildfire spread direction directly from smoke-plume analysis without any external wind measurements.
+        Achieving <span class="text-ember font-semibold">82.6% mAP@50</span> at <span class="text-ember font-semibold">133 FPS</span>.
       </p>
 
       <div class="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in-up-delay-3">
@@ -110,33 +99,30 @@ export function renderLanding(container) {
       <div class="glass-card p-8 md:p-10">
         <p class="text-text-secondary leading-relaxed text-lg mb-6">
           Wildfires pose an increasing threat to ecosystems, communities, and infrastructure worldwide.
-          Early detection is critical to minimizing damage and enabling rapid response. This project
-          presents a <span class="text-text-primary font-semibold">deep learning–based wildfire early detection system</span>
-          designed to operate on imagery captured by <span class="text-text-primary font-semibold">Unmanned Aerial Vehicles (UAVs)</span>.
+          Accurate wildfire spread direction prediction is a life-critical task that traditionally depends on knowing which way the wind is blowing.
+          This project presents a <span class="text-text-primary font-semibold">wind-sensor-free pipeline</span> that infers wildfire spread direction directly from a single RGB camera or UAV feed.
         </p>
         <p class="text-text-secondary leading-relaxed text-lg mb-6">
-          We leverage the <span class="text-ember font-semibold">YOLOv8s</span> architecture augmented with a <span class="text-text-primary font-semibold">P2 detection head</span> — providing 4× higher spatial resolution for small objects — fine-tuned to identify two critical early indicators of wildfire:
+          We leverage the <span class="text-ember font-semibold">YOLOv8s</span> architecture to identify fire and smoke, and implement a hierarchical, physics-informed pipeline that combines geometric cues (PCA plume-axis) and optical-flow to estimate the wind direction:
         </p>
         <div class="grid sm:grid-cols-2 gap-4 mb-6">
           <div class="flex items-center gap-4 p-4 rounded-xl bg-bg-tertiary border border-border">
             <span class="text-3xl">🔴</span>
             <div>
-              <p class="font-semibold text-text-primary">Early Fire</p>
-              <p class="text-sm text-text-muted">Nascent flame regions visible from aerial perspectives</p>
+              <p class="font-semibold text-text-primary">Fire</p>
+              <p class="text-sm text-text-muted">Used to compute fire-to-smoke centroid displacement</p>
             </div>
           </div>
           <div class="flex items-center gap-4 p-4 rounded-xl bg-bg-tertiary border border-border">
             <span class="text-3xl">🟠</span>
             <div>
-              <p class="font-semibold text-text-primary">Early Smoke</p>
-              <p class="text-sm text-text-muted">Smoke plumes indicative of fire ignition</p>
+              <p class="font-semibold text-text-primary">Smoke</p>
+              <p class="text-sm text-text-muted">Used for PCA shape analysis and optical flow motion tracking</p>
             </div>
           </div>
         </div>
         <p class="text-text-secondary leading-relaxed text-lg">
-          The model is trained on a synthetic dataset of <span class="text-text-primary font-semibold">13,862 early-stage images</span> generated via the <span class="text-text-primary font-semibold">Early-Stage Fire Simulation Augmentation (EFSA)</span> pipeline, 
-          and optimized for deployment using <span class="text-text-primary font-semibold">ONNX Runtime</span>,
-          enabling efficient inference on cloud platforms and edge devices.
+          The pipeline outputs an elliptical spread-risk projection following the Rothermel fire-spread model, and includes a confidence-thresholding mechanism to abstain when visual evidence is insufficient.
         </p>
       </div>
     </div>
@@ -155,7 +141,7 @@ export function renderLanding(container) {
     
     <div class="relative z-10 max-w-5xl mx-auto">
       <h2 class="section-title text-center gradient-text">Performance Metrics</h2>
-      <p class="section-subtitle text-center">Evaluation on the held-out EFSA test set</p>
+      <p class="section-subtitle text-center">Evaluation on the held-out test set at 960 px</p>
 
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6" id="metrics-grid">
         ${METRICS.map(
@@ -184,10 +170,10 @@ export function renderLanding(container) {
   gallery.className = "py-20 px-6";
   gallery.innerHTML = `
     <div class="max-w-6xl mx-auto">
-      <h2 class="section-title text-center gradient-text">Training Results</h2>
-      <p class="section-subtitle text-center">Detailed performance analysis and validation</p>
+      <h2 class="section-title text-center gradient-text">Results & Visualization</h2>
+      <p class="section-subtitle text-center">Qualitative spread-direction results and training progression</p>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="gallery-grid">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="gallery-grid">
         ${GALLERY_IMAGES.map(
           (img) => `
           <div class="glass-card overflow-hidden cursor-pointer group gallery-item" data-src="${img.src}">
@@ -223,10 +209,10 @@ export function renderLanding(container) {
   footer.innerHTML = `
     <div class="max-w-5xl mx-auto text-center">
       <p class="text-text-muted text-sm">
-        UAV Wildfire Early Detection System • Built with YOLOv8s-P2 + ONNX Runtime
+        Wind-Sensor-Free Spread Direction Pipeline • Built with YOLOv8s + ONNX Runtime + OpenCV
       </p>
       <p class="text-text-muted text-xs mt-2">
-        © 2026 DSP-UAV Project
+        © 2026 DSP-UAV Project Group 8
       </p>
     </div>
   `;

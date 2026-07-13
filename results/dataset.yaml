@@ -1,0 +1,8 @@
+names:
+  0: fire
+  1: smoke
+nc: 2
+path: /kaggle/input/datasets/dangnguyenminhduy/wildfireuav/merged
+test: images/test
+train: images/train
+val: images/val

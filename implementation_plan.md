@@ -1,61 +1,42 @@
-# UAV Wildfire Early Detection — Demo Website
+# Estimating Wildfire Spread Direction from Smoke-Plume Analysis: A Wind-Sensor-Free, Physics-Informed Pipeline
 
 ## Background & Project Research Findings
 
-This project trains a **YOLOv8s-P2** object detection model to detect **Early_Fire** and **Early_Smoke** from UAV aerial imagery for wildfire early warning.
+This project transitions from simple early warning detection to a comprehensive 4-phase pipeline that estimates wildfire spread direction directly from monocular camera or UAV imagery, without any external wind-sensor data. The system exploits the physical observation that a smoke plume is a passive tracer of the local wind field.
 
-### Training Summary
+### Pipeline Overview (4 Phases)
+- **Phase A (Detection)**: YOLOv8s (using `yolo26n.pt` from `results/`) object detection for `fire` (cls=0) and `smoke` (cls=1).
+- **Phase B (Geometry)**: Geometric direction estimation combining a fire-to-smoke displacement vector (Method A) and PCA smoke-plume axis (Method B).
+- **Phase C (Motion)**: Optical-flow confirmation (Farneback dense optical flow) for video inputs, tracking smoke motion.
+- **Phase D (Spread Risk)**: Elliptical spread-risk projection following the Rothermel fire-spread model.
 
-| Parameter | Value |
-|---|---|
-| **Model** | YOLOv8s-P2 |
-| **Task** | Object Detection |
-| **Classes** | `Early_Fire`, `Early_Smoke` (2 classes) |
-| **Image Size** | 1280×1280 |
-| **Batch Size** | 4 |
-| **Optimizer** | AdamW |
-| **Learning Rate** | lr0=0.001, lrf=0.01, cosine LR schedule |
-| **Epochs** | 100 (resumed training, epochs 87→100 logged) |
-| **Platform** | Kaggle — 2× Tesla T4 GPUs, 32 GB RAM |
-| **Dataset** | ~20,939 instances (12,139 Early_Fire + 8,800 Early_Smoke) |
-
-### Final Metrics (best.pt)
-
-| Metric | Value |
-|---|---|
-| **Precision** | 98.68% |
-| **Recall** | 96.16% |
-| **mAP@50** | 97.97% |
-| **mAP@50-95** | 89.11% |
-| **F1 Score** | 0.97 @ conf=0.380 |
-| **Early_Fire AP@50** | 96.5% |
-| **Early_Smoke AP@50** | 99.5% |
+### Final Model & System Parameters (from `results/`)
+- **Model Weights**: `yolo26n.pt` (to be exported to ONNX).
+- **Classes**: `fire`, `smoke`.
+- **NMS Thresholds**: Confidence > 0.25, IoU > 0.7.
+- **Geometry Conflict Angle (A vs B)**: 60° (flags disagreement without over-triggering on noise).
+- **Flow / Geometry Fusion Weight**: 70/30 (Phase C optical flow vs Phase B geometry).
+- **Flow / Geometry Conflict Angle**: 45°.
+- **EMA Smoothing Factor ($\alpha$)**: 0.3 (unit-circle domain).
+- **Motion Floor for Optical Flow**: 50 px.
+- **Confidence-Abstention Threshold**: 0.2 (system outputs "undetermined" if below).
+- **Spread-Ellipse Geometry**: Radius 15%, Eccentricity 0.8, Offset 40%.
 
 ---
 
-## Architecture Overview
+## User Review Required
 
-```
-┌─────────────────────────────┐      API calls       ┌──────────────────────────────┐
-│   FRONTEND (Firebase)       │ ◄──────────────────►  │    BACKEND (Cloud Run)       │
-│                             │                       │                              │
-│   Vite + Tailwind CSS v4    │   POST /api/detect/*  │    Flask + ONNX Runtime      │
-│   Static SPA                │   GET  /api/model-info│    best.onnx (optimized)     │
-│   Firebase Hosting          │                       │    Docker container          │
-└─────────────────────────────┘                       └──────────────────────────────┘
-```
+> [!IMPORTANT]
+> **Backend Video Processing**: Phase C requires computing dense optical flow between video frames. Processing full videos synchronously via an API might hit timeout limits on Cloud Run (300s). We need to decide if we want to extract frames at a lower FPS (e.g., 5-10 FPS) for the optical flow, or implement an asynchronous task queue.
+> **Please confirm if processing videos synchronously at a reduced frame rate is acceptable for this demo.**
 
-### Python Virtual Environment Strategy
+> [!WARNING]
+> **Model File Mismatch**: The report specifies YOLOv8s, but the weights in the `results/` folder are named `yolo26n.pt` (which indicates a nano model). The pipeline will proceed using `yolo26n.pt` as requested. Please confirm this is the intended weights file.
 
-Two separate `.venv` environments to isolate heavy export-time dependencies from the lightweight runtime:
+## Open Questions
 
-| Environment | Location | Purpose | Key Dependencies |
-|---|---|---|---|
-| **Export venv** | `J:\CPV-AI-PROJEKT\dsp-uav\.venv` | One-time ONNX model export | `ultralytics`, `torch`, `onnx`, `onnxsim` |
-| **Backend venv** | `J:\CPV-AI-PROJEKT\dsp-uav\backend\.venv` | Local backend dev server | `flask`, `flask-cors`, `onnxruntime`, `opencv-python-headless`, `numpy` |
-
-> [!NOTE]
-> The **export venv** is only needed once to convert `best.pt` → `best.onnx`. After export, it can be deleted. The **backend venv** is used for local development/testing. On Cloud Run, the Dockerfile installs dependencies in its own container (no venv needed).
+1. **Ellipse Rendering**: Should the Rothermel spread ellipse (Phase D) be drawn directly onto the image bytes by the Python backend using OpenCV, or should the backend return the ellipse parameters (center, axes, angle) for the Vite frontend to draw using a Canvas overlay?
+2. **Library Dependencies**: To perform PCA and circular EMA smoothing, should we add `scipy` to the backend, or write pure NumPy/OpenCV implementations to keep the Docker image as small as possible?
 
 ---
 
@@ -63,327 +44,54 @@ Two separate `.venv` environments to isolate heavy export-time dependencies from
 
 ### 0. Environment Setup & Model Optimization
 
-#### [NEW] [requirements-export.txt](file:///J:/CPV-AI-PROJEKT/dsp-uav/requirements-export.txt)
+#### [MODIFY] [requirements-export.txt](file:///j:/CPV-AI-PROJEKT/dsp-uav/requirements-export.txt)
+Update dependencies if necessary to match the YOLO version required for `yolo26n.pt`.
 
-Dependencies for the one-time ONNX export environment:
-```
-ultralytics>=8.3
-torch>=2.0
-onnx>=1.16
-onnxsim>=0.4
-```
+#### [MODIFY] [scripts/export_onnx.py](file:///j:/CPV-AI-PROJEKT/dsp-uav/scripts/export_onnx.py)
+Change the model input path to `results/yolo26n.pt` and output path to `backend/model/best.onnx`.
+Ensure `imgsz=640` is used for deployment inference as specified in the report.
 
-**Setup steps (automated in execution):**
-```powershell
-# Create export venv at project root
-python -m venv .venv
+### 1. Backend — Flask + ONNX Runtime API Server
 
-# Activate (Windows PowerShell)
-.\.venv\Scripts\Activate.ps1
+#### [MODIFY] [backend/requirements.txt](file:///j:/CPV-AI-PROJEKT/dsp-uav/backend/requirements.txt)
+Add `scipy` (if needed for PCA/circular stats) to support Phase B and C logic.
 
-# Install export dependencies
-pip install -r requirements-export.txt
-```
+#### [MODIFY] [backend/inference.py](file:///j:/CPV-AI-PROJEKT/dsp-uav/backend/inference.py)
+Rewrite the inference engine to implement the 4-phase pipeline:
+- **Phase A**: Run ONNX inference, apply NMS. Filter for `fire` and `smoke`.
+- **Phase B**:
+  - *Method A*: Compute vector from fire centroid to smoke centroid.
+  - *Method B*: Create an HSV mask of the smoke box, run PCA to find the dominant eigenvector (elongation axis).
+  - *Fusion*: Fuse A and B if both available, checking the 60° conflict angle.
+- **Phase C**: For video inputs, compute Farneback optical flow on the smoke mask. Fuse with Phase B at a 70/30 weight. Apply EMA ($\alpha=0.3$).
+- **Phase D**: If confidence >= 0.2, generate the Rothermel ellipse (15% radius, 0.8 ecc, 40% offset) rotated by the estimated wind angle. Draw the wind direction arrow (green) and the spread ellipse (orange semi-transparent) on the output frame.
 
-#### [NEW] [scripts/export_onnx.py](file:///J:/CPV-AI-PROJEKT/dsp-uav/scripts/export_onnx.py)
+#### [MODIFY] [backend/app.py](file:///j:/CPV-AI-PROJEKT/dsp-uav/backend/app.py)
+Update `/api/detect/image` and `/api/detect/video` to return the estimated wind direction angle and confidence score in the JSON response, alongside the annotated media. State management will be needed for `/api/detect/video` to handle the EMA smoothing across frames.
 
-Local utility script to convert `best.pt` → `best.onnx`:
-- Uses `ultralytics` to export with `format='onnx'`, `imgsz=1280`, `simplify=True`, `dynamic=True` (dynamic batch size)
-- Enables `opset=17` for broad ONNX Runtime compatibility
-- Output: `backend/model/best.onnx`
-- **Must be run inside the export `.venv`**
+### 2. Frontend — Vite + Tailwind CSS v4 SPA
 
-**Why ONNX?**
-- **~2-3× faster** CPU inference vs PyTorch (critical for Cloud Run which is CPU-only by default)
-- **Smaller Docker image** — no PyTorch dependency at runtime; only `onnxruntime` + `opencv`
-- **Lower memory footprint** — reduces Cloud Run cold start time and instance cost
-- **Framework-agnostic** — portable to any ONNX-compatible runtime
+#### [MODIFY] [frontend/src/pages/landing.js](file:///j:/CPV-AI-PROJEKT/dsp-uav/frontend/src/pages/landing.js)
+- Update the abstract to describe the "Wind-Sensor-Free, Physics-Informed Pipeline".
+- Update the metrics dashboard (e.g., mAP@50 = 82.6%, 133 FPS).
+- Update the gallery to display `fig_spread.png` and `fig_train_and_fps.png` from the `results/` folder.
 
----
-
-### 1. README.md
-
-#### [NEW] [README.md](file:///J:/CPV-AI-PROJEKT/dsp-uav/README.md)
-
-Comprehensive project README (also serves as landing page content source):
-- Project abstract & motivation for UAV-based wildfire early detection
-- Dataset description (2 classes, ~21K instances)
-- Model architecture (YOLOv8s-P2) & training pipeline
-- Key performance metrics table
-- Embedded training result figures from `phase1_epoch1-100_20260621_183619/`
-- Project timeline
-- Setup, build & deployment instructions for both backend and frontend
-
----
-
-### 2. Backend — Flask + ONNX Runtime API Server
-
-```
-backend/
-├── .venv/                 # Python virtual environment (local dev only, git-ignored)
-├── app.py                 # Flask application with API routes
-├── inference.py           # ONNX inference engine (pre/post-processing)
-├── requirements.txt       # Python dependencies (NO torch!)
-├── Dockerfile             # Cloud Run container definition
-├── .dockerignore
-├── .gitignore             # Ignores .venv/, __pycache__/, model/*.onnx
-└── model/
-    └── best.onnx          # Exported ONNX model (generated by export script)
-```
-
-**Backend venv setup (automated in execution):**
-```powershell
-cd backend
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
-```
-
-#### [NEW] [backend/inference.py](file:///J:/CPV-AI-PROJEKT/dsp-uav/backend/inference.py)
-
-Pure ONNX Runtime inference engine — **no PyTorch dependency**:
-- `OnnxDetector` class wrapping `onnxruntime.InferenceSession`
-- **Preprocessing**: letterbox resize to 1280×1280, BGR→RGB, normalize 0-1, NCHW transpose
-- **Postprocessing**: NMS (non-max suppression), confidence filtering, coordinate rescaling
-- **Bounding box drawing**: OpenCV-based, color-coded per class (red for Early_Fire, orange for Early_Smoke), with labels and confidence scores
-- Default confidence threshold: 0.38 (optimal F1 point from training curves)
-- Class names: `['Early_Fire', 'Early_Smoke']`
-
-#### [NEW] [backend/app.py](file:///J:/CPV-AI-PROJEKT/dsp-uav/backend/app.py)
-
-Flask server endpoints:
-- `POST /api/detect/image` — accepts image upload, returns annotated image as base64 JSON + detection list
-- `POST /api/detect/video` — accepts MP4 upload, processes frame-by-frame, returns annotated MP4
-- `GET /api/model-info` — returns model metadata (classes, metrics, threshold)
-- `GET /health` — health check for Cloud Run
-- CORS configured for the Firebase Hosting domain
-- Max upload: 50 MB images, 200 MB videos
-- Gunicorn production server in Docker
-
-#### [NEW] [backend/requirements.txt](file:///J:/CPV-AI-PROJEKT/dsp-uav/backend/requirements.txt)
-
-```
-flask==3.1.*
-flask-cors==5.*
-gunicorn==23.*
-onnxruntime==1.22.*
-opencv-python-headless==4.11.*
-numpy==2.*
-```
-
-> [!TIP]
-> No PyTorch or ultralytics dependency at runtime — the Docker image will be **~500 MB** instead of **~5 GB** with PyTorch.
-
-#### [NEW] [backend/Dockerfile](file:///J:/CPV-AI-PROJEKT/dsp-uav/backend/Dockerfile)
-
-```dockerfile
-FROM python:3.12-slim
-WORKDIR /app
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-COPY . .
-EXPOSE 8080
-CMD ["gunicorn", "--bind", "0.0.0.0:8080", "--timeout", "300", "--workers", "2", "app:app"]
-```
-
-- Slim Python base for minimal image size
-- `--timeout 300` to handle video processing
-- `--workers 2` for concurrent requests
-
----
-
-### 3. Frontend — Vite + Tailwind CSS v4 SPA
-
-```
-frontend/
-├── index.html              # Entry point
-├── package.json
-├── vite.config.js
-├── firebase.json           # Firebase Hosting config
-├── .firebaserc             # Firebase project association
-├── public/
-│   └── figures/            # Training result images (copied from runs/)
-│       ├── results.png
-│       ├── confusion_matrix.png
-│       ├── confusion_matrix_normalized.png
-│       ├── BoxPR_curve.png
-│       ├── BoxF1_curve.png
-│       ├── BoxP_curve.png
-│       ├── BoxR_curve.png
-│       ├── labels.jpg
-│       ├── val_batch0_pred.jpg
-│       ├── val_batch1_pred.jpg
-│       └── val_batch2_pred.jpg
-└── src/
-    ├── main.js             # SPA router + app initialization
-    ├── style.css           # Tailwind CSS v4 imports + custom design tokens
-    ├── pages/
-    │   ├── landing.js      # Landing page (abstract, metrics, timeline)
-    │   └── detect.js       # Detection page (upload, inference, results)
-    └── components/
-        ├── navbar.js       # Navigation bar
-        ├── timeline.js     # Project timeline component
-        └── upload.js       # Drag-and-drop file upload zone
-```
-
-#### [NEW] [frontend/src/style.css](file:///J:/CPV-AI-PROJEKT/dsp-uav/frontend/src/style.css)
-
-Tailwind CSS v4 with CSS-first configuration:
-
-```css
-@import "tailwindcss";
-
-@theme {
-  --color-bg-primary: #0a0a0a;
-  --color-bg-secondary: #141414;
-  --color-bg-tertiary: #1a1a1a;
-  --color-accent: #8b1a1a;
-  --color-accent-light: #b22222;
-  --color-accent-glow: rgba(139, 26, 26, 0.3);
-  --color-ember: #ff4444;
-  --color-smoke: #ff8c00;
-}
-```
-
-**Design Features:**
-- Dark background (`#0a0a0a`) with dark red accent (`#8b1a1a` / `#b22222`)
-- Glassmorphism cards with `backdrop-blur` and subtle accent glow borders
-- Animated ember particles on the hero section (CSS `@keyframes`)
-- Gradient hero section with fire-inspired linear gradients
-- Micro-animations: hover scale, glow pulse, smooth page transitions
-- Responsive design (mobile-first with `sm:`, `md:`, `lg:` breakpoints)
-- Custom scrollbar styled with accent color
-- Timeline component with animated connectors and pulse dots
-
-#### [NEW] [frontend/src/pages/landing.js](file:///J:/CPV-AI-PROJEKT/dsp-uav/frontend/src/pages/landing.js)
-
-Landing page sections:
-1. **Hero** — animated title with ember particle effect, tagline, CTA button
-2. **Abstract** — project overview rendered from README content
-3. **Metrics Dashboard** — animated counter cards for Precision, Recall, mAP50, F1
-4. **Training Results Gallery** — lightbox image gallery of training figures (PR curve, F1 curve, confusion matrix, etc.)
-5. **Timeline** — interactive project timeline with milestones
-
-#### [NEW] [frontend/src/pages/detect.js](file:///J:/CPV-AI-PROJEKT/dsp-uav/frontend/src/pages/detect.js)
-
-Detection page:
-- **Drag-and-drop zone** with animated dashed border (accepts `.jpg`, `.jpeg`, `.png`, `.mp4`)
-- **File preview** before detection (image thumbnail or video player)
-- **Confidence threshold slider** (0.1–0.9, default 0.38)
-- **"Detect" button** → calls Cloud Run backend API
-- **Loading state** with pulsing fire animation during inference
-- **Results panel**: side-by-side original vs. annotated image; for video, embedded video player
-- **Detection summary**: list of detected objects with class, confidence, coordinates
-- **Download button** for the annotated result
-
-#### [NEW] [frontend/firebase.json](file:///J:/CPV-AI-PROJEKT/dsp-uav/frontend/firebase.json)
-
-```json
-{
-  "hosting": {
-    "public": "dist",
-    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
-    "rewrites": [{ "source": "**", "destination": "/index.html" }]
-  }
-}
-```
-
----
-
-### 4. Deployment
-
-#### Step A: Create Export Venv & Export Model to ONNX (Local)
-```powershell
-# 1. Create and activate export venv
-cd J:\CPV-AI-PROJEKT\dsp-uav
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-
-# 2. Install export dependencies
-pip install -r requirements-export.txt
-
-# 3. Run export script
-python scripts/export_onnx.py
-# Produces: backend/model/best.onnx
-
-# 4. Deactivate (export venv no longer needed)
-deactivate
-```
-
-#### Step B: Create Backend Venv & Test Locally
-```powershell
-# 1. Create and activate backend venv
-cd backend
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-
-# 2. Install runtime dependencies
-pip install -r requirements.txt
-
-# 3. Test locally
-python app.py
-```
-
-#### Step C: Deploy Backend to Cloud Run
-1. Use the `deploy_local_folder` MCP tool to deploy `backend/` folder to Cloud Run
-2. Cloud Run will build the Dockerfile and deploy (Dockerfile installs deps independently — no venv needed in container)
-3. Note the service URL (e.g., `https://uav-wildfire-api-xxxxx-ew.a.run.app`)
-
-#### Step D: Update Frontend API URL
-1. Update the backend API URL in the frontend config to point to the Cloud Run service URL
-
-#### Step E: Deploy Frontend to Firebase Hosting
-1. Use `firebase_init` MCP tool to initialize Firebase Hosting for the `frontend/` directory
-2. Build: `npm run build` → produces `dist/`
-3. Use `firebase_deploy` MCP tool with `only: "hosting"` to deploy
-
----
-
-## User Review Required
-
-> [!IMPORTANT]
-> **GCP Project ID**: I need your Google Cloud Project ID to deploy to Cloud Run and Firebase Hosting. Please provide it before the deployment step.
-
-> [!IMPORTANT]
-> **Cloud Run Region**: The default region is `europe-west1`. Would you prefer a different region (e.g., `asia-southeast1` for lower latency from Vietnam)?
-
-> [!NOTE]
-> **ONNX Export venv**: The export script will automatically create a `.venv` at the project root and install `ultralytics` + `torch` into it. This venv is only needed once for the export step, and is separate from the backend runtime venv. You only need Python 3.10+ available on your system.
-
-## Open Questions
-
-1. **Project timeline content**: I'll generate a timeline based on artifact dates (June 21 training start → June 26 phase 2 → June 27 deployment). Should I use these, or do you have specific milestone dates?
-
-2. **Video processing limits**: Video processing on Cloud Run CPU can be slow (~2-5 fps for 1280px frames). Should I cap video length (e.g., max 30 seconds), or process at reduced resolution for speed?
+#### [MODIFY] [frontend/src/pages/detect.js](file:///j:/CPV-AI-PROJEKT/dsp-uav/frontend/src/pages/detect.js)
+- Add UI elements to display the overall estimated spread direction (angle) and confidence score.
+- Handle cases where the system reports "undetermined" (confidence < 0.2).
 
 ---
 
 ## Verification Plan
 
 ### Automated Tests
-```powershell
-# 1. ONNX export (in export venv)
-cd J:\CPV-AI-PROJEKT\dsp-uav
-.\.venv\Scripts\Activate.ps1
-python scripts/export_onnx.py  # verify model exports to backend/model/best.onnx
-deactivate
-
-# 2. Backend local test (in backend venv)
-cd backend
-.\.venv\Scripts\Activate.ps1
-python app.py  # verify Flask starts and /health returns 200
-deactivate
-
-# 3. Frontend build check
-cd ../frontend
-npm run build  # verify Vite builds successfully to dist/
-```
+1. **Model Export**: Run `export_onnx.py` to ensure `yolo26n.pt` successfully converts to ONNX at 640x640 resolution.
+2. **Backend Logic Unit Tests**: Mock YOLO bounding boxes and test Phase B (PCA/Vector) and Phase C (Optical flow) math to ensure angles are calculated correctly and EMA smoothing behaves as expected.
 
 ### Integration Test
-- Start backend locally (`.\.venv\Scripts\Activate.ps1` → `python app.py`) → upload test image → verify bounding box response
-- Start frontend locally (`npm run dev`) → verify it calls backend API correctly
+- Start the Flask backend. Upload an image containing both fire and smoke. Verify the JSON response contains the `direction_angle` and `confidence` fields, and the annotated image contains the green arrow and orange ellipse.
+- Upload a short video snippet to verify Phase C (Optical flow) triggers and stabilizes the direction arrow.
 
 ### Deployment Verification
-- Verify Cloud Run service is healthy (`/health` endpoint)
-- Verify Firebase Hosting serves the frontend
-- End-to-end: upload image through Firebase-hosted frontend → Cloud Run processes → annotated result returned
+- Deploy the updated backend to Cloud Run. Ensure the Docker container size remains manageable even with `scipy`/`opencv-python-headless`.
+- Verify the frontend correctly displays the new UI elements on Firebase Hosting.

@@ -18,8 +18,8 @@ def main():
     project_root = Path(__file__).resolve().parent.parent
     weights_path = (
         project_root
-        / "phase2_checkpoint"
-        / "best.pt"
+        / "results"
+        / "yolo26n.pt"
     )
     output_dir = project_root / "backend" / "model"
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -34,7 +34,7 @@ def main():
     print("Exporting to ONNX format...")
     export_path = model.export(
         format="onnx",
-        imgsz=1280,
+        imgsz=640,
         simplify=True,
         dynamic=True,
         opset=17,

@@ -14,7 +14,7 @@ import numpy as np
 from flask import Flask, jsonify, request, send_file
 from flask_cors import CORS
 
-from inference import OnnxDetector, CLASS_NAMES, DEFAULT_CONFIDENCE
+from inference import OnnxDetector, DirectionEstimator, CLASS_NAMES, DEFAULT_CONFIDENCE
 
 # --- Configuration ---
 MODEL_PATH = os.environ.get("MODEL_PATH", os.path.join("model", "best.onnx"))
@@ -112,10 +112,15 @@ def detect_image():
     # Run detection
     start_time = time.time()
     detections = detector.detect(img, conf_threshold=conf)
+    
+    # Estimate direction
+    estimator = DirectionEstimator()
+    angle, dir_conf = estimator.estimate(img, detections, is_video=False)
+    
     processing_time = time.time() - start_time
 
-    # Draw bounding boxes
-    annotated = detector.draw_detections(img, detections)
+    # Draw bounding boxes and spread direction overlay
+    annotated = detector.draw_detections(img, detections, angle, dir_conf)
 
     # Encode annotated image to base64
     _, buffer = cv2.imencode(".jpg", annotated, [cv2.IMWRITE_JPEG_QUALITY, 95])
@@ -124,6 +129,8 @@ def detect_image():
     return jsonify({
         "annotated_image": img_base64,
         "detections": detections,
+        "direction_angle": angle,
+        "direction_confidence": dir_conf,
         "processing_time": round(processing_time, 3),
         "image_size": {"width": img.shape[1], "height": img.shape[0]},
         "confidence_threshold": conf,
@@ -201,6 +208,9 @@ def detect_video():
         frame_idx = 0
         processed = 0
         last_detections = []
+        last_angle = None
+        last_conf = 0.0
+        estimator = DirectionEstimator()
 
         while cap.isOpened() and frame_idx < max_frames:
             ret, frame = cap.read()
@@ -210,10 +220,11 @@ def detect_video():
             if frame_idx % frame_skip == 0:
                 # Run detection on this frame
                 last_detections = detector.detect(frame, conf_threshold=conf)
+                last_angle, last_conf = estimator.estimate(frame, last_detections, is_video=True)
                 processed += 1
 
             # Draw detections (even on skipped frames, use last detections)
-            annotated = detector.draw_detections(frame, last_detections)
+            annotated = detector.draw_detections(frame, last_detections, last_angle, last_conf)
             writer.write(annotated)
 
             frame_idx += 1
