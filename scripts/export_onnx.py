@@ -1,5 +1,13 @@
 """
-Export YOLOv8s-P2 best.pt to ONNX format for optimized inference.
+Export the trained YOLOv8s weights to ONNX for optimized inference.
+
+Source: results/runs/fasdd_train/weights/best.pt — YOLOv8s retrained on the
+FASDD dataset (imgsz=960, best epoch 31). This model actually detects the
+`smoke` class on real aerial imagery, unlike the earlier phase02/03 weights
+which were poisoned by unlabelled smoke and video-level leakage
+(see docs/smoke_defect_report.md).
+
+Output: backend/model/best.onnx (imgsz=640, dynamic axes, opset 17).
 
 Run this script inside the export virtual environment:
     .\.venv\Scripts\Activate.ps1
@@ -19,7 +27,10 @@ def main():
     weights_path = (
         project_root
         / "results"
-        / "yolo26n.pt"
+        / "runs"
+        / "fasdd_train"
+        / "weights"
+        / "best.pt"
     )
     output_dir = project_root / "backend" / "model"
     output_dir.mkdir(parents=True, exist_ok=True)

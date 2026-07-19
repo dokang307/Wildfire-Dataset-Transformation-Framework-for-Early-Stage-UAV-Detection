@@ -1,0 +1,158 @@
+✅ W&B: https://wandb.ai/minhtrietsonny-fpt-university/wildfire-spread-prediction/runs/szm2i807
+✅ Copied run folder to /kaggle/working/runs/fasdd_train
+Resume from: /kaggle/working/runs/fasdd_train/weights/last.pt
+Ultralytics 8.4.100 🚀 Python-3.12.13 torch-2.10.0+cu128 CUDA:0 (Tesla T4, 14912MiB)
+[34m[1mengine/trainer: [0magnostic_nms=False, amp=True, angle=1.0, augment=True, auto_augment=randaugment, batch=32, bgr=0.0, box=7.5, cache=False, cfg=None, classes=None, close_mosaic=20, cls=1.5, cls_pw=0.0, cls_remap=True, compile=False, conf=None, copy_paste=0.15, copy_paste_mode=flip, cos_lr=True, cutmix=0.0, data=/kaggle/working/fasdd_yolo/dataset.yaml, degrees=10.0, deterministic=True, device=, dfl=1.5, dis=6.0, distill_model=None, dnn=False, dropout=0.1, dynamic=False, embed=None, end2end=None, epochs=50, erasing=0.3, exist_ok=True, fliplr=0.5, flipud=0.0, format=torchscript, fraction=1.0, freeze=None, hsv_h=0.015, hsv_s=0.3, hsv_v=0.4, imgsz=960, iou=0.7, keras=False, kobj=1.0, line_width=None, lr0=0.01, lrf=0.01, mask_ratio=4, max_det=300, mixup=0.2, mode=train, model=/kaggle/working/runs/fasdd_train/weights/last.pt, momentum=0.937, mosaic=1.0, multi_scale=0.0, name=fasdd_train, nbs=64, nms=False, opset=None, optimize=False, optimizer=auto, overlap_mask=True, patience=15, perspective=0.0005, plots=True, pose=12.0, pretrained=True, profile=False, project=/kaggle/working/runs, quantize=None, rect=False, resume=/kaggle/working/runs/fasdd_train/weights/last.pt, retina_masks=False, rle=1.0, save=True, save_conf=False, save_crop=False, save_dir=/kaggle/working/runs/fasdd_train, save_frames=False, save_json=False, save_period=-1, save_txt=False, scale=0.5, seed=42, shear=2.0, show=False, show_boxes=True, show_conf=True, show_labels=True, simplify=True, single_cls=False, source=None, split=val, stream_buffer=False, task=detect, time=None, tracker=tracktrack.yaml, translate=0.2, val=True, verbose=True, vid_stride=1, visualize=False, warmup_bias_lr=0.0, warmup_epochs=5, warmup_momentum=0.5, weight_decay=0.0005, workers=8, workspace=None
+[KDownloading https://ultralytics.com/assets/Arial.ttf to '/root/.config/Ultralytics/Arial.ttf': 100% ━━━━━━━━━━━━ 755.1KB 4.9MB/s 0.1s 0.1s<0.2s
+
+                   from  n    params  module                                       arguments
+  0                  -1  1       928  ultralytics.nn.modules.conv.Conv             [3, 32, 3, 2]
+  1                  -1  1     18560  ultralytics.nn.modules.conv.Conv             [32, 64, 3, 2]
+  2                  -1  1     29056  ultralytics.nn.modules.block.C2f             [64, 64, 1, True]
+  3                  -1  1     73984  ultralytics.nn.modules.conv.Conv             [64, 128, 3, 2]
+  4                  -1  2    197632  ultralytics.nn.modules.block.C2f             [128, 128, 2, True]
+  5                  -1  1    295424  ultralytics.nn.modules.conv.Conv             [128, 256, 3, 2]
+  6                  -1  2    788480  ultralytics.nn.modules.block.C2f             [256, 256, 2, True]
+  7                  -1  1   1180672  ultralytics.nn.modules.conv.Conv             [256, 512, 3, 2]
+  8                  -1  1   1838080  ultralytics.nn.modules.block.C2f             [512, 512, 1, True]
+  9                  -1  1    656896  ultralytics.nn.modules.block.SPPF            [512, 512, 5]
+ 10                  -1  1         0  torch.nn.modules.upsampling.Upsample         [None, 2, 'nearest']
+ 11             [-1, 6]  1         0  ultralytics.nn.modules.conv.Concat           [1]
+ 12                  -1  1    591360  ultralytics.nn.modules.block.C2f             [768, 256, 1]
+ 13                  -1  1         0  torch.nn.modules.upsampling.Upsample         [None, 2, 'nearest']
+ 14             [-1, 4]  1         0  ultralytics.nn.modules.conv.Concat           [1]
+ 15                  -1  1    148224  ultralytics.nn.modules.block.C2f             [384, 128, 1]
+ 16                  -1  1    147712  ultralytics.nn.modules.conv.Conv             [128, 128, 3, 2]
+ 17            [-1, 12]  1         0  ultralytics.nn.modules.conv.Concat           [1]
+ 18                  -1  1    493056  ultralytics.nn.modules.block.C2f             [384, 256, 1]
+ 19                  -1  1    590336  ultralytics.nn.modules.conv.Conv             [256, 256, 3, 2]
+ 20             [-1, 9]  1         0  ultralytics.nn.modules.conv.Concat           [1]
+ 21                  -1  1   1969152  ultralytics.nn.modules.block.C2f             [768, 512, 1]
+ 22        [15, 18, 21]  1   2116822  ultralytics.nn.modules.head.Detect           [2, 16, None, [128, 256, 512]]
+Model summary: 130 layers, 11,136,374 parameters, 11,136,358 gradients, 28.6 GFLOPs
+
+Transferred 355/355 items from pretrained weights
+Freezing layer 'model.22.dfl.conv.weight'
+[34m[1mAMP: [0mrunning Automatic Mixed Precision (AMP) checks...
+[KDownloading https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo26n.pt to 'yolo26n.pt': 100% ━━━━━━━━━━━━ 5.3MB 21.1MB/s 0.3s.2s<0.2s5s
+[34m[1mAMP: [0mchecks passed ✅
+WARNING ⚠️ [34m[1mtrain: [0mSlow image access detected (ping: 0.4±0.2 ms, read: 10.1±16.7 MB/s, size: 71.1 KB). Use local storage instead of remote/mounted storage for better performance. See https://docs.ultralytics.com/guides/model-training-tips/
+[K[34m[1mtrain: [0mScanning /kaggle/working/fasdd_yolo/labels/train... 63546 images, 26133 backgrounds, 0 corrupt: 100% ━━━━━━━━━━━━ 63546/63546 422.9it/s 2:300.1ss
+[34m[1mtrain: [0mNew cache created: /kaggle/working/fasdd_yolo/labels/train.cache
+[34m[1malbumentations: [0mBlur(p=0.01, blur_limit=(3, 7)), MedianBlur(p=0.01, blur_limit=(3, 7)), ToGray(p=0.01, method='weighted_average', num_output_channels=3), CLAHE(p=0.01, clip_limit=(1.0, 4.0), tile_grid_size=(8, 8))
+WARNING ⚠️ [34m[1mval: [0mSlow image access detected (ping: 0.2±0.2 ms, read: 13.4±24.6 MB/s, size: 147.7 KB). Use local storage instead of remote/mounted storage for better performance. See https://docs.ultralytics.com/guides/model-training-tips/
+[K[34m[1mval: [0mScanning /kaggle/working/fasdd_yolo/labels/val... 15884 images, 6533 backgrounds, 0 corrupt: 100% ━━━━━━━━━━━━ 15884/15884 382.4it/s 41.5s0.0ss
+[34m[1mval: [0mNew cache created: /kaggle/working/fasdd_yolo/labels/val.cache
+[34m[1moptimizer:[0m 'optimizer=auto' found, ignoring 'lr0=0.01' and 'momentum=0.937' and determining best 'optimizer', 'lr0' and 'momentum' automatically...
+[34m[1moptimizer:[0m MuSGD(lr=0.01, momentum=0.9) with parameter groups 57 weight(decay=0.0), 64 weight(decay=0.0005), 63 bias(decay=0.0)
+Plotting labels to /kaggle/working/runs/fasdd_train/labels.jpg...
+Resuming training /kaggle/working/runs/fasdd_train/weights/last.pt from epoch 16 to 50 total epochs
+Image sizes 960 train, 960 val
+Using 2 dataloader workers
+Logging results to [1m/kaggle/working/runs/fasdd_train[0m
+Starting training for 50 epochs...
+
+      Epoch    GPU_mem   box_loss   cls_loss   dfl_loss  Instances       Size
+[K      16/50      14.1G      1.499      4.554      1.701         98        960: 100% ━━━━━━━━━━━━ 1986/1986 1.2s/it 38:511.1ss
+Warning: unknown JFIF revision number 32.23
+Warning: unknown JFIF revision number 32.23
+[K                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95): 100% ━━━━━━━━━━━━ 249/249 1.3it/s 3:080.6ss
+                   all      15884      21452      0.763      0.655      0.751      0.444
+
+      Epoch    GPU_mem   box_loss   cls_loss   dfl_loss  Instances       Size
+[K      17/50      14.2G      1.504      4.563      1.697        100        960: 100% ━━━━━━━━━━━━ 1986/1986 1.2s/it 38:541.1ss
+Warning: unknown JFIF revision number 32.23
+[K                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95): 100% ━━━━━━━━━━━━ 249/249 1.3it/s 3:060.6ss
+                   all      15884      21452      0.765      0.656      0.752      0.446
+
+      Epoch    GPU_mem   box_loss   cls_loss   dfl_loss  Instances       Size
+[K      18/50      14.1G      1.494      4.513      1.689        105        960: 100% ━━━━━━━━━━━━ 1986/1986 1.2s/it 38:511.1ss
+Warning: unknown JFIF revision number 32.23
+[K                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95): 100% ━━━━━━━━━━━━ 249/249 1.3it/s 3:060.6ss
+                   all      15884      21452      0.765      0.657      0.753      0.447
+
+      Epoch    GPU_mem   box_loss   cls_loss   dfl_loss  Instances       Size
+[K      19/50      14.1G       1.48      4.452       1.68         51        960: 100% ━━━━━━━━━━━━ 1986/1986 1.2s/it 38:511.1ss
+Warning: unknown JFIF revision number 32.23
+Warning: unknown JFIF revision number 32.23
+[K                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95): 100% ━━━━━━━━━━━━ 249/249 1.3it/s 3:060.6ss
+                   all      15884      21452      0.766      0.657      0.755      0.449
+
+      Epoch    GPU_mem   box_loss   cls_loss   dfl_loss  Instances       Size
+[K      20/50      14.3G       1.48      4.428      1.676         69        960: 100% ━━━━━━━━━━━━ 1986/1986 1.2s/it 38:511.1ss
+Warning: unknown JFIF revision number 32.23
+[K                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95): 100% ━━━━━━━━━━━━ 249/249 1.3it/s 3:060.6ss
+                   all      15884      21452      0.762      0.662      0.755       0.45
+
+      Epoch    GPU_mem   box_loss   cls_loss   dfl_loss  Instances       Size
+[K      21/50      14.3G      1.466      4.384      1.667        111        960: 100% ━━━━━━━━━━━━ 1986/1986 1.2s/it 38:551.1ss
+Warning: unknown JFIF revision number 32.23
+[K                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95): 100% ━━━━━━━━━━━━ 249/249 1.3it/s 3:060.6ss
+                   all      15884      21452      0.762      0.664      0.757      0.453
+
+      Epoch    GPU_mem   box_loss   cls_loss   dfl_loss  Instances       Size
+[K      22/50      14.2G      1.458      4.337      1.658         67        960: 100% ━━━━━━━━━━━━ 1986/1986 1.2s/it 38:521.1ss
+Warning: unknown JFIF revision number 32.23
+[K                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95): 100% ━━━━━━━━━━━━ 249/249 1.3it/s 3:070.6ss
+                   all      15884      21452      0.766      0.664      0.758      0.455
+
+      Epoch    GPU_mem   box_loss   cls_loss   dfl_loss  Instances       Size
+[K      23/50      14.1G      1.448      4.276      1.648         87        960: 100% ━━━━━━━━━━━━ 1986/1986 1.2s/it 38:551.1ss
+Warning: unknown JFIF revision number 32.23
+[K                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95): 100% ━━━━━━━━━━━━ 249/249 1.3it/s 3:070.6ss
+                   all      15884      21452      0.768      0.665      0.759      0.456
+
+      Epoch    GPU_mem   box_loss   cls_loss   dfl_loss  Instances       Size
+[K      24/50      14.3G       1.46      4.306      1.654        121        960: 7% ╸─────────── 144/1986 1.2s/it 2:51<36:55WARNING ⚠️ CUDA OutOfMemoryError in TaskAlignedAssigner, using CPU
+[K      24/50      14.3G      1.442      4.254      1.645        104        960: 100% ━━━━━━━━━━━━ 1986/1986 1.2s/it 38:591.1ss
+Warning: unknown JFIF revision number 32.23
+[K                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95): 100% ━━━━━━━━━━━━ 249/249 1.3it/s 3:060.6ss
+                   all      15884      21452      0.769      0.666       0.76      0.459
+
+      Epoch    GPU_mem   box_loss   cls_loss   dfl_loss  Instances       Size
+[K      25/50      14.2G      1.433        4.2      1.637         99        960: 100% ━━━━━━━━━━━━ 1986/1986 1.2s/it 38:541.1ss
+Warning: unknown JFIF revision number 32.23
+[K                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95): 100% ━━━━━━━━━━━━ 249/249 1.3it/s 3:070.6ss
+                   all      15884      21452      0.773      0.666      0.761       0.46
+
+      Epoch    GPU_mem   box_loss   cls_loss   dfl_loss  Instances       Size
+[K      26/50      14.2G      1.427      4.155      1.633         69        960: 100% ━━━━━━━━━━━━ 1986/1986 1.2s/it 38:561.1ss
+Warning: unknown JFIF revision number 32.23
+[K                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95): 100% ━━━━━━━━━━━━ 249/249 1.3it/s 3:050.6ss
+                   all      15884      21452      0.772      0.668      0.763      0.462
+
+      Epoch    GPU_mem   box_loss   cls_loss   dfl_loss  Instances       Size
+[K      27/50      14.2G       1.42      4.117      1.627         87        960: 100% ━━━━━━━━━━━━ 1986/1986 1.2s/it 38:571.1ss
+Warning: unknown JFIF revision number 32.23
+[K                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95): 100% ━━━━━━━━━━━━ 249/249 1.3it/s 3:060.6ss
+                   all      15884      21452      0.774      0.669      0.764      0.464
+
+      Epoch    GPU_mem   box_loss   cls_loss   dfl_loss  Instances       Size
+[K      28/50      14.3G       1.41      4.073      1.616         88        960: 100% ━━━━━━━━━━━━ 1986/1986 1.2s/it 38:561.1ss
+Warning: unknown JFIF revision number 32.23
+[K                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95): 100% ━━━━━━━━━━━━ 249/249 1.3it/s 3:060.6ss
+                   all      15884      21452      0.773      0.671      0.765      0.466
+
+      Epoch    GPU_mem   box_loss   cls_loss   dfl_loss  Instances       Size
+[K      29/50      14.3G      1.406      4.066      1.614         90        960: 100% ━━━━━━━━━━━━ 1986/1986 1.2s/it 38:531.1ss
+Warning: unknown JFIF revision number 32.23
+[K                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95): 100% ━━━━━━━━━━━━ 249/249 1.3it/s 3:060.6ss
+                   all      15884      21452      0.774      0.672      0.767      0.468
+
+      Epoch    GPU_mem   box_loss   cls_loss   dfl_loss  Instances       Size
+[K      30/50      14.1G      1.395      4.022      1.606         92        960: 100% ━━━━━━━━━━━━ 1986/1986 1.2s/it 38:541.1ss
+Warning: unknown JFIF revision number 32.23
+[K                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95): 100% ━━━━━━━━━━━━ 249/249 1.3it/s 3:070.6ss
+                   all      15884      21452      0.774      0.673      0.768       0.47
+Closing dataloader mosaic
+[34m[1malbumentations: [0mBlur(p=0.01, blur_limit=(3, 7)), MedianBlur(p=0.01, blur_limit=(3, 7)), ToGray(p=0.01, method='weighted_average', num_output_channels=3), CLAHE(p=0.01, clip_limit=(1.0, 4.0), tile_grid_size=(8, 8))
+
+      Epoch    GPU_mem   box_loss   cls_loss   dfl_loss  Instances       Size
+[K      31/50        14G       1.36      3.472      1.595         30        960: 100% ━━━━━━━━━━━━ 1986/1986 1.2s/it 39:031.1ss
+Warning: unknown JFIF revision number 32.23
+[K                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95): 100% ━━━━━━━━━━━━ 249/249 1.3it/s 3:060.6ss
+                   all      15884      21452      0.773      0.675      0.769      0.472
+
+      Epoch    GPU_mem   box_loss   cls_loss   dfl_loss  Instances       Size
+[K      32/50      14.1G      1.345      3.393      1.585         42        960: 97% ━━━━━━━━━━━╸ 1929/1986 1.2s/it 37:56<1:066
+Warning: unknown JFIF revision number 32.23

@@ -103,14 +103,15 @@ export function renderDetect(container) {
               </div>
             </div>
             <!-- Direction result -->
-            <div id="direction-result" class="hidden mb-3 p-3 rounded-lg bg-bg-tertiary border border-border flex items-center justify-between">
+            <div id="direction-result" class="hidden mb-3 p-3 rounded-lg bg-bg-tertiary border border-border">
               <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center text-accent-light text-xl">🧭</div>
                 <div>
-                  <p class="text-sm font-semibold text-text-primary">Spread Direction</p>
-                  <p class="text-xs text-text-muted"><span id="dir-angle" class="font-bold text-accent-light"></span> <span id="dir-conf-wrap">(Conf: <span id="dir-conf"></span>)</span></p>
+                  <p class="text-sm font-semibold text-text-primary">Spread Direction <span id="dir-count" class="text-xs font-normal text-text-muted"></span></p>
+                  <p class="text-xs text-text-muted" id="dir-summary"></p>
                 </div>
               </div>
+              <div id="dir-list" class="flex flex-wrap gap-2 mt-3"></div>
             </div>
             <!-- Detection list -->
             <div id="detection-list" class="space-y-2 max-h-48 overflow-y-auto"></div>
@@ -254,16 +255,57 @@ export function renderDetect(container) {
         page.querySelector("#result-time").textContent =
           `${data.processing_time}s`;
 
-        // Show Direction Result
+        // Show Direction Result — one chip per fire (falls back to the scalar
+        // fields if an older backend doesn't return the `directions` array).
         const dirResult = page.querySelector("#direction-result");
-        if (data.direction_confidence >= 0.2 && data.direction_angle !== null) {
-          page.querySelector("#dir-angle").textContent = Math.round(data.direction_angle) + "°";
-          page.querySelector("#dir-conf").textContent = data.direction_confidence.toFixed(2);
-          page.querySelector("#dir-conf-wrap").style.display = "inline";
+        const dirList = page.querySelector("#dir-list");
+        const dirSummary = page.querySelector("#dir-summary");
+        const dirCount = page.querySelector("#dir-count");
+        dirList.innerHTML = "";
+
+        let dirs = [];
+        if (Array.isArray(data.directions)) {
+          dirs = data.directions.filter(
+            (d) => d.theta !== null && d.theta !== undefined && d.conf >= 0.2
+          );
+        } else if (data.direction_angle !== null && data.direction_confidence >= 0.2) {
+          dirs = [{
+            theta: data.direction_angle,
+            conf: data.direction_confidence,
+            method: data.direction_method,
+          }];
+        }
+
+        if (dirs.length > 0) {
+          dirCount.textContent = dirs.length > 1 ? `· ${dirs.length} fire fronts` : "";
+          dirSummary.textContent =
+            dirs.length > 1
+              ? "Estimated spread direction per fire"
+              : `${Math.round(dirs[0].theta)}° (conf ${dirs[0].conf.toFixed(2)})`;
+
+          dirs
+            .slice()
+            .sort((a, b) => b.conf - a.conf)
+            .forEach((d) => {
+              // Arrow glyph points east (0°); math angle is CCW so rotate by -theta on screen.
+              const chip = document.createElement("div");
+              chip.className =
+                "flex items-center gap-1.5 px-2 py-1 rounded-md bg-bg-secondary border border-border text-xs font-mono";
+              chip.innerHTML = `
+                <span class="inline-block text-accent-light" style="transform: rotate(${-d.theta}deg)">➤</span>
+                <span class="font-bold text-text-primary">${Math.round(d.theta)}°</span>
+                <span class="text-text-muted">${d.conf.toFixed(2)}</span>
+                ${d.method ? `<span class="text-text-muted">[${d.method}]</span>` : ""}
+              `;
+              dirList.appendChild(chip);
+            });
           dirResult.classList.remove("hidden");
-        } else if (data.direction_confidence !== undefined) {
-          page.querySelector("#dir-angle").textContent = "Undetermined";
-          page.querySelector("#dir-conf-wrap").style.display = "none";
+        } else if (
+          data.direction_confidence !== undefined ||
+          Array.isArray(data.directions)
+        ) {
+          dirCount.textContent = "";
+          dirSummary.textContent = "Undetermined";
           dirResult.classList.remove("hidden");
         } else {
           dirResult.classList.add("hidden");

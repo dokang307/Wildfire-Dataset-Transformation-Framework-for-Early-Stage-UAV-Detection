@@ -9,6 +9,7 @@ import os
 import tempfile
 import time
 
+# Trigger auto-reload for new model
 import cv2
 import numpy as np
 from flask import Flask, jsonify, request, send_file
@@ -39,7 +40,7 @@ print("Model loaded successfully!")
 @app.route("/health", methods=["GET"])
 def health():
     """Health check endpoint for Cloud Run."""
-    return jsonify({"status": "healthy", "model": "YOLOv8s-P2-wildfire-onnx"})
+    return jsonify({"status": "healthy", "model": "YOLOv8s-wildfire-onnx"})
 
 
 # --- Model Info ---
@@ -47,17 +48,19 @@ def health():
 def model_info():
     """Return model metadata."""
     return jsonify({
-        "model": "YOLOv8s-P2",
+        "model": "YOLOv8s",
+        "dataset": "FASDD",
         "format": "ONNX",
         "classes": CLASS_NAMES,
         "input_size": f"{detector.input_width}x{detector.input_height}",
         "default_confidence": DEFAULT_CONFIDENCE,
+        # Validation metrics (all classes) from results/runs/fasdd_train, best epoch 31.
         "metrics": {
-            "precision": 0.9868,
-            "recall": 0.9616,
-            "mAP50": 0.9797,
-            "mAP50_95": 0.8911,
-            "f1": 0.97,
+            "precision": 0.773,
+            "recall": 0.675,
+            "mAP50": 0.769,
+            "mAP50_95": 0.472,
+            "f1": 0.721,
         },
     })
 
@@ -113,24 +116,29 @@ def detect_image():
     start_time = time.time()
     detections = detector.detect(img, conf_threshold=conf)
     
-    # Estimate direction
+    # Estimate one spread direction per fire
     estimator = DirectionEstimator()
-    angle, dir_conf = estimator.estimate(img, detections, is_video=False)
-    
+    directions = estimator.estimate_multi(img, detections)
+
     processing_time = time.time() - start_time
 
-    # Draw bounding boxes and spread direction overlay
-    annotated = detector.draw_detections(img, detections, angle, dir_conf)
+    # Draw bounding boxes and one spread overlay per direction
+    annotated = detector.draw_detections(img, detections, directions)
 
     # Encode annotated image to base64
     _, buffer = cv2.imencode(".jpg", annotated, [cv2.IMWRITE_JPEG_QUALITY, 95])
     img_base64 = base64.b64encode(buffer).decode("utf-8")
 
+    # Representative (highest-confidence) direction for the scalar fields.
+    primary = max(directions, key=lambda d: d["conf"], default=None)
+
     return jsonify({
         "annotated_image": img_base64,
         "detections": detections,
-        "direction_angle": angle,
-        "direction_confidence": dir_conf,
+        "direction_angle": primary["theta"] if primary else None,
+        "direction_confidence": primary["conf"] if primary else 0.0,
+        "direction_method": primary["method"] if primary else None,
+        "directions": directions,
         "processing_time": round(processing_time, 3),
         "image_size": {"width": img.shape[1], "height": img.shape[0]},
         "confidence_threshold": conf,
@@ -210,6 +218,8 @@ def detect_video():
         last_detections = []
         last_angle = None
         last_conf = 0.0
+        last_method = None
+        last_directions = []
         estimator = DirectionEstimator()
 
         while cap.isOpened() and frame_idx < max_frames:
@@ -220,11 +230,17 @@ def detect_video():
             if frame_idx % frame_skip == 0:
                 # Run detection on this frame
                 last_detections = detector.detect(frame, conf_threshold=conf)
-                last_angle, last_conf = estimator.estimate(frame, last_detections, is_video=True)
+                last_angle, last_conf, last_method = estimator.estimate(frame, last_detections, is_video=True)
+                # Video keeps the temporally-smoothed single global direction
+                # (Phase C/D), anchored on the largest fire by draw_detections.
+                if last_angle is not None:
+                    last_directions = [{"theta": last_angle, "conf": last_conf, "method": last_method}]
+                else:
+                    last_directions = []
                 processed += 1
 
             # Draw detections (even on skipped frames, use last detections)
-            annotated = detector.draw_detections(frame, last_detections, last_angle, last_conf)
+            annotated = detector.draw_detections(frame, last_detections, last_directions)
             writer.write(annotated)
 
             frame_idx += 1
