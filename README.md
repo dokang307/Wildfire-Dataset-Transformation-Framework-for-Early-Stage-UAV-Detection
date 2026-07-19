@@ -44,11 +44,11 @@ The detection backbone is trained on the **FASDD** (Fire And Smoke Detection Dat
 
 ### Detection Results
 
-Trained on Kaggle. Metrics below are the validation results from the `fasdd_train` run (YOLOv8s, imgsz 960, best epoch 31).
+Trained on Kaggle. Metrics below are the validation results from the `fasdd_train` run (YOLOv8s, imgsz 960, best epoch 47).
 
 | Split | imgsz | Precision | Recall | mAP@50 | mAP@50-95 |
 |---|---|---|---|---|---|
-| val | 960 | 0.773 | 0.675 | **0.769** | 0.472 |
+| val | 960 | 0.777 | 0.694 | **0.781** | 0.492 |
 
 *Per-class (fire vs smoke) and held-out test metrics are pending a dedicated `model.val()` run on the FASDD test split — run it on Kaggle and record the numbers here.*
 

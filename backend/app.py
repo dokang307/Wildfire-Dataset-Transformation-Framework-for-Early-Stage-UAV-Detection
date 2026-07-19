@@ -54,13 +54,13 @@ def model_info():
         "classes": CLASS_NAMES,
         "input_size": f"{detector.input_width}x{detector.input_height}",
         "default_confidence": DEFAULT_CONFIDENCE,
-        # Validation metrics (all classes) from results/runs/fasdd_train, best epoch 31.
+        # Validation metrics (all classes) from results/runs/fasdd_train, best epoch 47.
         "metrics": {
-            "precision": 0.773,
-            "recall": 0.675,
-            "mAP50": 0.769,
-            "mAP50_95": 0.472,
-            "f1": 0.721,
+            "precision": 0.777,
+            "recall": 0.694,
+            "mAP50": 0.781,
+            "mAP50_95": 0.492,
+            "f1": 0.733,
         },
     })
 
