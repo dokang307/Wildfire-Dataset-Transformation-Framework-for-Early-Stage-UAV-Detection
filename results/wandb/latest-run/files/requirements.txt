@@ -2,7 +2,7 @@ types-setuptools==82.0.0.20260508
 requirements-parser==0.9.0
 pip==24.1.2
 ultralytics-thop==2.0.20
-ultralytics==8.4.101
+ultralytics==8.4.102
 pytools==2026.1.1
 pycuda==2026.1
 siphash24==1.8

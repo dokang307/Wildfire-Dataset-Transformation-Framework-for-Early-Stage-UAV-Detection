@@ -2,10 +2,13 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
-# Install system dependencies for OpenCV
+# System deps for OpenCV, plus ffmpeg: opencv-python-headless has no H.264
+# encoder, so /api/detect/video falls back to mp4v (which browsers cannot play
+# inline) and is re-encoded to H.264 with ffmpeg/libx264.
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libgl1-mesa-glx \
     libglib2.0-0 \
+    ffmpeg \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .

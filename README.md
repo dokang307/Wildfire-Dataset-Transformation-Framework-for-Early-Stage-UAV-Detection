@@ -44,13 +44,20 @@ The detection backbone is trained on the **FASDD** (Fire And Smoke Detection Dat
 
 ### Detection Results
 
-Trained on Kaggle. Metrics below are the validation results from the `fasdd_train` run (YOLOv8s, imgsz 960, best epoch 47).
+Trained on Kaggle. Metrics below are the validation results from the completed 50-epoch `fasdd_train` run (YOLOv8s, imgsz 960, best epoch 50).
 
 | Split | imgsz | Precision | Recall | mAP@50 | mAP@50-95 |
 |---|---|---|---|---|---|
-| val | 960 | 0.777 | 0.694 | **0.781** | 0.492 |
+| val | 960 | 0.777 | 0.695 | **0.781** | 0.492 |
 
-*Per-class (fire vs smoke) and held-out test metrics are pending a dedicated `model.val()` run on the FASDD test split — run it on Kaggle and record the numbers here.*
+**Per-class recall (FASDD test split, from the normalized confusion matrix)**
+
+| Class | Recall | Missed as background |
+|---|---|---|
+| fire | 0.86 | 0.14 |
+| smoke | **0.82** | 0.17 |
+
+*Per-class precision and mAP are pending — capture them from the `model.val()` stdout on Kaggle.*
 
 > **Why the numbers changed:** earlier reports cited mAP@50 = 0.826 with smoke mAP@50 = 0.939. Those weights were trained on a dataset where smoke was largely unlabelled and where video frames leaked across the train/test split, so the smoke figure measured memorisation of a few scenes rather than generalisation — the model scored ~0.006 on smoke for unseen aerial imagery. Retraining on FASDD produces lower but **trustworthy** numbers, and the detector now finds smoke on real UAV photos. See [docs/smoke_defect_report.md](docs/smoke_defect_report.md).
 

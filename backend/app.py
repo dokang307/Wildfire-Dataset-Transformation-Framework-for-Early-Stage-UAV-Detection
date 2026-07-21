@@ -6,6 +6,8 @@ Serves detection endpoints using ONNX Runtime inference.
 import base64
 import io
 import os
+import shutil
+import subprocess
 import tempfile
 import time
 
@@ -22,6 +24,56 @@ MODEL_PATH = os.environ.get("MODEL_PATH", os.path.join("model", "best.onnx"))
 MAX_IMAGE_SIZE = 50 * 1024 * 1024   # 50 MB
 MAX_VIDEO_SIZE = 200 * 1024 * 1024  # 200 MB
 PORT = int(os.environ.get("PORT", 5000))
+
+# Tried in order; the first two are H.264 (playable inline in browsers), mp4v is
+# the always-available fallback so the endpoint never returns an empty file.
+VIDEO_CODECS = ("avc1", "H264", "mp4v")
+BROWSER_SAFE_CODECS = {"avc1", "H264"}
+TRANSCODE_TIMEOUT = 120  # seconds
+
+
+def _find_ffmpeg():
+    """Locate an ffmpeg binary: system PATH first, then the imageio-ffmpeg wheel."""
+    exe = shutil.which("ffmpeg")
+    if exe:
+        return exe
+    try:
+        import imageio_ffmpeg
+        return imageio_ffmpeg.get_ffmpeg_exe()
+    except Exception:
+        return None
+
+
+def _transcode_to_h264(src_path):
+    """Re-encode to browser-playable H.264. Returns the new path, or None.
+
+    Many OpenCV builds ship without an H.264 encoder (openh264 is loaded
+    dynamically and is often missing), so cv2 falls back to mp4v, which browsers
+    cannot play inline. ffmpeg with libx264 fixes that; yuv420p + faststart are
+    what make the result actually play in a <video> tag.
+    """
+    ffmpeg = _find_ffmpeg()
+    if not ffmpeg:
+        return None
+
+    dst = tempfile.mktemp(suffix="_h264.mp4")
+    cmd = [
+        ffmpeg, "-y", "-loglevel", "error", "-i", src_path,
+        "-c:v", "libx264", "-preset", "veryfast", "-crf", "23",
+        "-pix_fmt", "yuv420p", "-movflags", "+faststart", dst,
+    ]
+    try:
+        subprocess.run(cmd, check=True, timeout=TRANSCODE_TIMEOUT,
+                       stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+    except Exception as exc:
+        app.logger.warning("H.264 transcode failed: %s", exc)
+        if os.path.exists(dst):
+            os.unlink(dst)
+        return None
+
+    if os.path.exists(dst) and os.path.getsize(dst) > 0:
+        return dst
+    return None
 
 # Allowed origins (update with your Firebase Hosting URL after deployment)
 ALLOWED_ORIGINS = os.environ.get("ALLOWED_ORIGINS", "*").split(",")
@@ -54,13 +106,14 @@ def model_info():
         "classes": CLASS_NAMES,
         "input_size": f"{detector.input_width}x{detector.input_height}",
         "default_confidence": DEFAULT_CONFIDENCE,
-        # Validation metrics (all classes) from results/runs/fasdd_train, best epoch 47.
+        # Validation metrics (all classes) from results/runs/fasdd_train,
+        # completed 50-epoch run (best epoch 50).
         "metrics": {
             "precision": 0.777,
-            "recall": 0.694,
+            "recall": 0.695,
             "mAP50": 0.781,
             "mAP50_95": 0.492,
-            "f1": 0.733,
+            "f1": 0.734,
         },
     })
 
@@ -190,6 +243,7 @@ def detect_video():
 
     # Output temp file
     output_path = tempfile.mktemp(suffix=".mp4")
+    transcoded_path = None
 
     try:
         # Open video
@@ -209,9 +263,28 @@ def detect_video():
         # Limit video length (max ~30 seconds of processed frames)
         max_frames = int(30 * fps)
 
-        # Setup video writer (use avc1 for H.264 HTML5 video support)
-        fourcc = cv2.VideoWriter_fourcc(*"avc1")
-        writer = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
+        # Setup video writer. avc1/H264 is what browsers can play inline, but
+        # many OpenCV builds ship without an H.264 encoder, in which case
+        # VideoWriter fails to open and silently writes nothing. Fall back so we
+        # always produce a file, and fail loudly if no encoder works at all.
+        writer, codec = None, None
+        for name in VIDEO_CODECS:
+            candidate = cv2.VideoWriter(output_path, cv2.VideoWriter_fourcc(*name), fps, (width, height))
+            if candidate.isOpened():
+                writer, codec = candidate, name
+                break
+            candidate.release()
+
+        if writer is None:
+            return jsonify({
+                "error": "No usable video encoder found on the server "
+                         f"(tried {', '.join(VIDEO_CODECS)}). Install an H.264-capable OpenCV/FFmpeg build."
+            }), 500
+
+        if codec not in BROWSER_SAFE_CODECS:
+            app.logger.warning(
+                "H.264 unavailable; encoded with '%s'. The file may not play inline in browsers.", codec
+            )
 
         frame_idx = 0
         processed = 0
@@ -248,9 +321,30 @@ def detect_video():
         cap.release()
         writer.release()
 
-        # Send the annotated video
+        # The writer can still produce nothing (bad codec/size); catch it here
+        # instead of letting send_file raise FileNotFoundError.
+        if not os.path.exists(output_path) or os.path.getsize(output_path) == 0:
+            return jsonify({"error": f"Video encoding produced no output (codec '{codec}')"}), 500
+
+        # cv2 fell back to a non-browser codec -> re-encode with ffmpeg so the
+        # clip plays inline in the frontend's <video> tag.
+        send_path = output_path
+        if codec not in BROWSER_SAFE_CODECS:
+            transcoded_path = _transcode_to_h264(output_path)
+            if transcoded_path:
+                send_path = transcoded_path
+                app.logger.info("Transcoded '%s' output to H.264", codec)
+            else:
+                app.logger.warning(
+                    "Returning '%s' video; install ffmpeg (libx264) for inline browser playback.", codec
+                )
+
+        # Read into memory so the temp files can be removed in `finally`.
+        with open(send_path, "rb") as fh:
+            video_bytes = fh.read()
+
         return send_file(
-            output_path,
+            io.BytesIO(video_bytes),
             mimetype="video/mp4",
             as_attachment=True,
             download_name="detected_output.mp4",
@@ -258,9 +352,12 @@ def detect_video():
 
     finally:
         # Cleanup temp files
-        if os.path.exists(input_path):
-            os.unlink(input_path)
-        # Note: output_path cleanup happens after send_file completes
+        for path in (input_path, output_path, transcoded_path):
+            if path and os.path.exists(path):
+                try:
+                    os.unlink(path)
+                except OSError:
+                    pass
 
 
 # --- Error Handlers ---
