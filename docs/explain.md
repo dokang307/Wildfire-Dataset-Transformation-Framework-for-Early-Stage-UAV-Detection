@@ -107,7 +107,7 @@ Trước FASDD, dự án dùng một corpus gộp (DBA-YOLO + FLAME negatives) v
 1. **Thiếu nhãn khói** — ~60% ảnh có cột khói rõ nhưng chỉ được gán nhãn `fire`. Khói không nhãn bị huấn luyện thành *background*, triệt tiêu hoàn toàn lớp `smoke`.
 2. **Rò rỉ dữ liệu theo video** — toàn bộ năng lực nhận khói chỉ đến từ **5 video nguồn**, các khung hình cách nhau 1 frame nằm ở cả train lẫn test.
 
-Hậu quả: model báo smoke mAP@50 = 0.939 nhưng khi gặp ảnh UAV thật thì điểm lớp smoke chỉ **0.006** (mù hoàn toàn). Chi tiết điều tra: [`smoke_defect_report.md`](smoke_defect_report.md).
+Hậu quả: model báo smoke mAP@50 = 0.939 nhưng khi gặp ảnh UAV thật thì điểm lớp smoke chỉ **0.006** (mù hoàn toàn). Đó là lý do dự án chuyển sang FASDD.
 
 > **Bài học:** mAP trên tập test *in-distribution* có thể che giấu hoàn toàn việc model không tổng quát hoá. Luôn cần một tập kiểm tra **ngoài phân phối (OOD)**.
 
@@ -656,5 +656,5 @@ Ngưỡng `S < 60 ∧ V > 90` bắt mọi vùng xám nhạt. Mây, sương mù, 
 | Kiểm thử (24 test) | [`backend/test_direction.py`](../backend/test_direction.py) |
 | Xuất ONNX | [`scripts/export_onnx.py`](../scripts/export_onnx.py) |
 | Notebook huấn luyện (4 pha) | `fadd-training-batch32-phase03-fixed.ipynb` |
-| Điều tra lỗi dataset | [`smoke_defect_report.md`](smoke_defect_report.md) |
+| Kết quả đánh giá test | [`eval_results_explaination.md`](eval_results_explaination.md) |
 | Audit nhãn | [`scripts/audit_labels.py`](../scripts/audit_labels.py) |
